@@ -1,0 +1,26 @@
+[Unit]
+Description=REBL's distributed currency daemon
+After=network.target
+
+[Service]
+User=rebellious
+Group=rebellious
+
+Type=forking
+PIDFile=/var/lib/rebelliousd/rebelliousd.pid
+
+ExecStart=/usr/bin/rebelliousd -daemon -pid=/var/lib/rebelliousd/rebelliousd.pid \
+          -conf=/etc/rebellious/rebellious.conf -datadir=/var/lib/rebelliousd
+
+ExecStop=-/usr/bin/rebellious-cli -conf=/etc/rebellious/rebellious.conf \
+         -datadir=/var/lib/rebelliousd stop
+
+Restart=always
+PrivateTmp=true
+TimeoutStopSec=60s
+TimeoutStartSec=2s
+StartLimitInterval=120s
+StartLimitBurst=5
+
+[Install]
+WantedBy=multi-user.target

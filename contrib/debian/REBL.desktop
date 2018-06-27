@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Rebellious
+Comment=Rebellious P2P Cryptocurrency
+Exec=rebellious-qt %u
+Terminal=false
+Type=Application
+Icon=rebellious128
+MimeType=x-scheme-handler/rebellious;
+Categories=Office;Finance;
+Name[en_AU]=Rebellious

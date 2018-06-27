@@ -1,0 +1,17 @@
+<!DOCTYPE RCC><RCC version="1.0">
+    <qresource prefix="/translations">
+        <file alias="ca">locale/rebellious_ca.qm</file>
+        <file alias="da">locale/rebellious_da.qm</file>
+        <file alias="de">locale/rebellious_de.qm</file>
+        <file alias="en">locale/rebellious_en.qm</file>
+        <file alias="en_US">locale/rebellious_en_US.qm</file>
+        <file alias="es">locale/rebellious_es.qm</file>
+        <file alias="fr_FR">locale/rebellious_fr_FR.qm</file>
+        <file alias="it">locale/rebellious_it.qm</file>
+        <file alias="ja">locale/rebellious_ja.qm</file>
+        <file alias="pt">locale/rebellious_pt.qm</file>
+        <file alias="ro_RO">locale/rebellious_ro_RO.qm</file>
+        <file alias="ru">locale/rebellious_ru.qm</file>
+        <file alias="zh_TW">locale/rebellious_zh_TW.qm</file>
+    </qresource>
+</RCC>
