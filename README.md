@@ -1,4 +1,4 @@
-![REBL Logo](https://github.com/RebelliousToken/REBL/blob/master/rebellious_logo_horizontal.png)
+![REBL Logo](https://github.com/RebelliousToken/REBL/blob/master/src/qt/res/images/rebellious_logo_horizontal.png)
 
 Rebellious is GNU AGPLv3 licensed.
 
