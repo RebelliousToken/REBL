@@ -23,10 +23,16 @@
 #include <QSettings>
 #include <QTimer>
 #include <QGraphicsDropShadowEffect>
+#include <QMargins>
+#include <QDesktopServices>
+#include <QUrl>
 
-#define DECORATION_SIZE 35
-#define ICON_OFFSET 16
+#define DECORATION_SIZE 25
+#define ICON_OFFSET 13
 #define NUM_ITEMS 5
+#define ROW_SPACING 30
+#define CORRECTION 20
+#define BORDER_RADIUS 5
 
 class TxViewDelegate : public QAbstractItemDelegate
 {
@@ -40,19 +46,32 @@ public:
     {
         painter->save();
 
+        QFont font = painter->font();
+
+        painter->setRenderHint(QPainter::Antialiasing);
+        QPainterPath path;
+        path.addRoundedRect(option.rect.x()-ICON_OFFSET, option.rect.y()-CORRECTION, option.rect.width()+40, option.rect.height()+(CORRECTION * 2.5), BORDER_RADIUS, BORDER_RADIUS);
+        QPen pen(QColor(255, 255, 255), 0);
+        painter->setPen(pen);
+        painter->fillPath(path, QColor(255, 255, 255));
+        painter->drawPath(path);
+
         QIcon icon = qvariant_cast<QIcon>(index.data(Qt::DecorationRole));
         QRect mainRect = option.rect;
         mainRect.moveLeft(ICON_OFFSET);
-        QRect decorationRect(mainRect.topLeft(), QSize(DECORATION_SIZE, DECORATION_SIZE));
-        int xspace = DECORATION_SIZE + 8;
+        QRect decorationRect(mainRect.left()+ICON_OFFSET, mainRect.top() + 4, DECORATION_SIZE, DECORATION_SIZE);
+        int xspace = DECORATION_SIZE + ICON_OFFSET + 10;
         int ypad = 6;
         int halfheight = (mainRect.height() - 2 * ypad) / 2;
-        QRect amountRect(mainRect.left() + xspace, mainRect.top() + ypad, mainRect.width() - xspace - ICON_OFFSET, halfheight);
-        QRect addressRect(mainRect.left() + xspace, mainRect.top() + ypad + halfheight, mainRect.width() - xspace, halfheight);
+
+        QRect dateRect(mainRect.left() + xspace, mainRect.top() + ypad + 20, mainRect.width() - xspace - ICON_OFFSET, mainRect.height());
+        QRect amountRect(mainRect.left() + xspace, mainRect.top() + ypad, mainRect.width() - xspace - ICON_OFFSET, mainRect.height());
+        QRect labelRect(mainRect.left() + xspace, mainRect.top() + ypad - 20, mainRect.width() - xspace, mainRect.height());
+        QRect addressRect(mainRect.left() + xspace, mainRect.top() + ypad, mainRect.width() - xspace, mainRect.height());
         icon.paint(painter, decorationRect);
 
         QDateTime date = index.data(TransactionTableModel::DateRole).toDateTime();
-        QString address = index.data(Qt::DisplayRole).toString();
+        QString label = index.data(TransactionTableModel::LabelRole).toString();
         qint64 amount = index.data(TransactionTableModel::AmountRole).toLongLong();
         bool confirmed = index.data(TransactionTableModel::ConfirmedRole).toBool();
         QVariant value = index.data(Qt::ForegroundRole);
@@ -64,6 +83,18 @@ public:
 
         painter->setPen(foreground);
         QRect boundingRect;
+
+        font.setPixelSize(16);
+        painter->setPen(COLOR_BLACK);
+        font.setWeight(QFont::DemiBold);
+        painter->setFont(font);
+        painter->drawText(labelRect, Qt::AlignLeft | Qt::AlignVCenter, (label.isEmpty() ? tr("Unknown") : label), &boundingRect);
+
+        QString address = "(" + index.data(TransactionTableModel::AddressRole).toString() + ")";
+
+        font.setPixelSize(14);
+        painter->setPen(COLOR_BLUE);
+        painter->setFont(font);
         painter->drawText(addressRect, Qt::AlignLeft | Qt::AlignVCenter, address, &boundingRect);
 
         if (index.data(TransactionTableModel::WatchonlyRole).toBool()) {
@@ -77,21 +108,22 @@ public:
         } else if (!confirmed) {
             foreground = COLOR_UNCONFIRMED;
         } else {
-            foreground = COLOR_GREEN;
+            foreground = COLOR_BLUE;
         }
         painter->setPen(foreground);
-        QFont font = painter->font();
+
         font.setPixelSize(16);
         font.setWeight(QFont::DemiBold);
         painter->setFont(font);
-        QString amountText = BitcoinUnits::formatWithUnit(unit, amount, true, BitcoinUnits::separatorAlways);
+        QString amountText = BitcoinUnits::simpleFormat(BitcoinUnits::REBL, amount, true, BitcoinUnits::separatorAlways, 2);
+
         if (!confirmed) {
             amountText = QString("[") + amountText + QString("]");
         }
         painter->drawText(amountRect, Qt::AlignRight | Qt::AlignVCenter, amountText);
 
         painter->setPen(COLOR_BLACK);
-        painter->drawText(amountRect, Qt::AlignLeft | Qt::AlignVCenter, GUIUtil::dateTimeStr(date));
+        painter->drawText(dateRect, Qt::AlignLeft | Qt::AlignVCenter, GUIUtil::dateTimeStr(date));
 
         painter->restore();
     }
@@ -124,8 +156,11 @@ OverviewPage::OverviewPage(QWidget* parent) : QWidget(parent),
     // Recent transactions
     ui->listTransactions->setItemDelegate(txdelegate);
     ui->listTransactions->setIconSize(QSize(DECORATION_SIZE, DECORATION_SIZE));
-    ui->listTransactions->setMinimumHeight(NUM_ITEMS * (DECORATION_SIZE + 2));
+    ui->listTransactions->setMinimumHeight(NUM_ITEMS+ROW_SPACING * (DECORATION_SIZE + 2));
     ui->listTransactions->setAttribute(Qt::WA_MacShowFocusRect, false);
+    ui->listTransactions->setSpacing(ROW_SPACING);
+//    ui->listTransactions->setMinimumWidth(1150);
+    ui->listTransactions->setUniformItemSizes(true);
 
     connect(ui->listTransactions, SIGNAL(clicked(QModelIndex)), this, SLOT(handleTransactionClicked(QModelIndex)));
 
@@ -134,38 +169,61 @@ OverviewPage::OverviewPage(QWidget* parent) : QWidget(parent),
     const int shadowOffsetY = 3;
     QColor shadowColor = QColor(0, 0, 0, 50);
 
-    QGraphicsDropShadowEffect *availableShadow = new QGraphicsDropShadowEffect();
-    availableShadow->setBlurRadius(shadowBlurRadius);
-    availableShadow->setColor(shadowColor);
-    availableShadow->setOffset(shadowOffsetX, shadowOffsetY);
-    ui->availableWidget->setGraphicsEffect(availableShadow);
+    QGraphicsDropShadowEffect *transactionShadow = new QGraphicsDropShadowEffect();
+    transactionShadow->setBlurRadius(shadowBlurRadius);
+    transactionShadow->setColor(shadowColor);
+    transactionShadow->setOffset(shadowOffsetX, shadowOffsetY);
+    ui->listTransactions->setGraphicsEffect(transactionShadow);
 
+    QGraphicsDropShadowEffect *balancesShadow = new QGraphicsDropShadowEffect();
+    balancesShadow->setBlurRadius(shadowBlurRadius);
+    balancesShadow->setColor(shadowColor);
+    balancesShadow->setOffset(shadowOffsetX, shadowOffsetY);
+    ui->balancesWidget->setGraphicsEffect(balancesShadow);
 
-    QGraphicsDropShadowEffect *immatureShadow = new QGraphicsDropShadowEffect();
-    immatureShadow->setBlurRadius(shadowBlurRadius);
-    immatureShadow->setColor(shadowColor);
-    immatureShadow->setOffset(shadowOffsetX, shadowOffsetY);
-    ui->immatureWidget->setGraphicsEffect(immatureShadow);
+    QGraphicsDropShadowEffect *supportBlockShadow = new QGraphicsDropShadowEffect();
+    supportBlockShadow->setBlurRadius(shadowBlurRadius);
+    supportBlockShadow->setColor(shadowColor);
+    supportBlockShadow->setOffset(shadowOffsetX, shadowOffsetY);
+    ui->supportBlock->setGraphicsEffect(supportBlockShadow);
 
+    QPixmap totalBalanceIcon(":/icons/balance");
+    totalBalanceIcon = totalBalanceIcon.scaled(QSize(25,25),  Qt::KeepAspectRatio);
+    QLabel* totalBalanceIconLabel = new QLabel();
+    QLabel* totalBalanceTextLabel = new QLabel(tr("Total Balance"));
+    totalBalanceIconLabel->setPixmap(totalBalanceIcon);
+    ui->totalBalanceTextHLayout->addWidget(totalBalanceIconLabel);
+    ui->totalBalanceTextHLayout->addWidget(totalBalanceTextLabel);
 
-    QGraphicsDropShadowEffect *pendingShadow = new QGraphicsDropShadowEffect();
-    pendingShadow->setBlurRadius(shadowBlurRadius);
-    pendingShadow->setColor(shadowColor);
-    pendingShadow->setOffset(shadowOffsetX, shadowOffsetY);
-    ui->pendingWidget->setGraphicsEffect(pendingShadow);
+    QPixmap supportIcon(":/icons/support");
+    supportIcon = supportIcon.scaled(QSize(25,25),  Qt::KeepAspectRatio);
+    QLabel* supportIconLabel = new QLabel();
+    QLabel* supportTextLabel = new QLabel(tr("Support"));
+    supportIconLabel->setPixmap(supportIcon);
+    ui->supportHLayout->addWidget(supportIconLabel);
+    ui->supportHLayout->addWidget(supportTextLabel);
 
+    totalBalanceTextLabel->setStyleSheet("color:#BABABA;font-size:14px;");
+    ui->chargeButton->setStyleSheet(QString::fromUtf8("border: 2px solid #00A4B3;"
+                                                   "border-radius: 20px;"
+                                                   "height: 26px;"
+                                                   "padding: 5px;"
+                                                   "font-weight: bold;"
+                                                   "color: #00A4B3;"));
 
-    QGraphicsDropShadowEffect *totalShadow = new QGraphicsDropShadowEffect();
-    totalShadow->setBlurRadius(shadowBlurRadius);
-    totalShadow->setColor(shadowColor);
-    totalShadow->setOffset(shadowOffsetX, shadowOffsetY);
-    ui->totalWidget->setGraphicsEffect(totalShadow);
+    ui->labelTotal->setStyleSheet("font-size:18px;font-weight:400;color:#00A4B3!important;");
 
+    ui->phoneButton->setCursor(Qt::PointingHandCursor);
+    ui->emailButton->setCursor(Qt::PointingHandCursor);
+    ui->socialButton->setCursor(Qt::PointingHandCursor);
+    ui->phoneButtonText->setCursor(Qt::PointingHandCursor);
+    ui->emailButtonText->setCursor(Qt::PointingHandCursor);
+    ui->socialButtonText->setCursor(Qt::PointingHandCursor);
 
     // init "out of sync" warning labels
     ui->labelWalletStatus->setText("(" + tr("out of sync") + ")");
 //    ui->labelDarksendSyncStatus->setText("(" + tr("out of sync") + ")");
-    ui->labelTransactionsStatus->setText("(" + tr("out of sync") + ")");
+//    ui->labelTransactionsStatus->setText("(" + tr("out of sync") + ")");
 #if 0
     if (!fLiteMode) {
         ui->frameDarksend->setVisible(false);
@@ -215,14 +273,15 @@ void OverviewPage::setBalance(const CAmount& balance, const CAmount& unconfirmed
     currentWatchUnconfBalance = watchUnconfBalance;
     currentWatchImmatureBalance = watchImmatureBalance;
 
+    const int decimalsWidth = 2;
 
 //    ui->labelImmature->setVisible(showImmature || showWatchOnlyImmature);
 
-    ui->labelBalance->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, balance - immatureBalance, false, BitcoinUnits::separatorAlways));
-    ui->labelUnconfirmed->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, unconfirmedBalance, false, BitcoinUnits::separatorAlways));
-    ui->labelImmature->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, immatureBalance, false, BitcoinUnits::separatorAlways));
+    ui->labelBalance->setText(BitcoinUnits::simpleFormatWithUnit(nDisplayUnit, balance - immatureBalance, false, BitcoinUnits::separatorAlways, decimalsWidth));
+    ui->labelUnconfirmed->setText(BitcoinUnits::simpleFormatWithUnit(nDisplayUnit, unconfirmedBalance, false, BitcoinUnits::separatorAlways, decimalsWidth));
+    ui->labelImmature->setText(BitcoinUnits::simpleFormatWithUnit(nDisplayUnit, immatureBalance, false, BitcoinUnits::separatorAlways, decimalsWidth));
 //    ui->labelAnonymized->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, anonymizedBalance, false, BitcoinUnits::separatorAlways));
-    ui->labelTotal->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, balance + unconfirmedBalance, false, BitcoinUnits::separatorAlways));
+    ui->labelTotal->setText(BitcoinUnits::simpleFormatWithUnit(nDisplayUnit, balance + unconfirmedBalance, false, BitcoinUnits::separatorAlways, decimalsWidth));
 //    ui->labelWatchAvailable->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, watchOnlyBalance, false, BitcoinUnits::separatorAlways));
 //    ui->labelWatchPending->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, watchUnconfBalance, false, BitcoinUnits::separatorAlways));
 //    ui->labelWatchImmature->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, watchImmatureBalance, false, BitcoinUnits::separatorAlways));
@@ -230,8 +289,8 @@ void OverviewPage::setBalance(const CAmount& balance, const CAmount& unconfirmed
 
     // only show immature (newly mined) balance if it's non-zero, so as not to complicate things
     // for the non-mining users
-    bool showImmature = immatureBalance != 0;
-    bool showWatchOnlyImmature = watchImmatureBalance != 0;
+//    bool showImmature = immatureBalance != 0;
+//    bool showWatchOnlyImmature = watchImmatureBalance != 0;
 
     // for symmetry reasons also show immature label when the watch-only one is shown
 //    ui->labelImmature->setVisible(showImmature || showWatchOnlyImmature);
@@ -252,7 +311,7 @@ void OverviewPage::setBalance(const CAmount& balance, const CAmount& unconfirmed
 void OverviewPage::updateWatchOnlyLabels(bool showWatchOnly)
 {
 //    ui->widget->setVisible(showWatchOnly);      // show watch-only label
-    ui->labelSpendable->setVisible(showWatchOnly);      // show spendable label (only when watch-only is active)
+//    ui->labelSpendable->setVisible(showWatchOnly);      // show spendable label (only when watch-only is active)
 //    ui->labelWatchonly->setVisible(showWatchOnly);      // show watch-only label
    // ui->lineWatchBalance->setVisible(showWatchOnly);    // show watch-only balance separator line
 //    ui->labelWatchAvailable->setVisible(showWatchOnly); // show watch-only available balance
@@ -340,7 +399,7 @@ void OverviewPage::showOutOfSyncWarning(bool fShow)
 {
     ui->labelWalletStatus->setVisible(fShow);
 //    ui->labelDarksendSyncStatus->setVisible(fShow);
-    ui->labelTransactionsStatus->setVisible(fShow);
+//    ui->labelTransactionsStatus->setVisible(fShow);
 }
 
 void OverviewPage::updateDarksendProgress()
@@ -580,4 +639,39 @@ void OverviewPage::toggleDarksend()
         }
     }
 #endif
+}
+
+void OverviewPage::on_chargeButton_clicked()
+{
+    QDesktopServices::openUrl(QUrl("http://rebellious.io"));
+}
+
+void OverviewPage::on_phoneButton_clicked()
+{
+    QDesktopServices::openUrl(QUrl("http://rebellious.io/contact/"));
+}
+
+void OverviewPage::on_phoneButtonText_clicked()
+{
+    QDesktopServices::openUrl(QUrl("http://rebellious.io/contact/"));
+}
+
+void OverviewPage::on_emailButton_clicked()
+{
+    QDesktopServices::openUrl(QUrl("http://rebellious.io/contact/"));
+}
+
+void OverviewPage::on_emailButtonText_clicked()
+{
+    QDesktopServices::openUrl(QUrl("http://rebellious.io/contact/"));
+}
+
+void OverviewPage::on_socialButton_clicked()
+{
+    QDesktopServices::openUrl(QUrl("http://rebellious.io/community/"));
+}
+
+void OverviewPage::on_socialButtonText_clicked()
+{
+    QDesktopServices::openUrl(QUrl("http://rebellious.io/community/"));
 }

@@ -210,7 +210,7 @@ TransactionTableModel::TransactionTableModel(CWallet* wallet, WalletModel* paren
                                                                                      priv(new TransactionTablePriv(wallet, this)),
                                                                                      fProcessingQueuedTransactions(false)
 {
-    columns << QString() << QString() << tr("Date") << tr("Type") << tr("Address") << BitcoinUnits::getAmountColumnTitle(walletModel->getOptionsModel()->getDisplayUnit());
+    columns << QString() << QString() << tr("Type") << tr("Date") << tr("Address") << BitcoinUnits::getAmountColumnTitle(walletModel->getOptionsModel()->getDisplayUnit());
     priv->refreshWallet();
 
     connect(walletModel->getOptionsModel(), SIGNAL(displayUnitChanged(int)), this, SLOT(updateDisplayUnit()));
@@ -371,10 +371,9 @@ QVariant TransactionTableModel::txAddressDecoration(const TransactionRecord* wtx
     case TransactionRecord::RecvWithDarksend:
     case TransactionRecord::RecvWithAddress:
     case TransactionRecord::RecvFromOther:
-        return QIcon(":/icons/tx_input");
     case TransactionRecord::SendToAddress:
     case TransactionRecord::SendToOther:
-        return QIcon(":/icons/tx_output");
+        return QIcon(":/icons/tx_input");
     default:
         return QIcon(":/icons/tx_inout");
     }
@@ -431,7 +430,7 @@ QVariant TransactionTableModel::addressColor(const TransactionRecord* wtx) const
 
 QString TransactionTableModel::formatTxAmount(const TransactionRecord* wtx, bool showUnconfirmed, BitcoinUnits::SeparatorStyle separators) const
 {
-    QString str = BitcoinUnits::format(walletModel->getOptionsModel()->getDisplayUnit(), wtx->credit + wtx->debit, false, separators);
+    QString str = BitcoinUnits::simpleFormat(walletModel->getOptionsModel()->getDisplayUnit(), wtx->credit + wtx->debit, false, separators, 2);
     if (showUnconfirmed) {
         if (!wtx->status.countsForBalance) {
             str = QString("[") + str + QString("]");
@@ -490,7 +489,7 @@ QVariant TransactionTableModel::txWatchonlyDecoration(const TransactionRecord* w
 
 QString TransactionTableModel::formatTooltip(const TransactionRecord* rec) const
 {
-    QString tooltip = formatTxStatus(rec) + QString("\n QWER") + formatTxType(rec);
+    QString tooltip = formatTxStatus(rec) + formatTxType(rec);
     if (rec->type == TransactionRecord::RecvFromOther || rec->type == TransactionRecord::SendToOther ||
         rec->type == TransactionRecord::SendToAddress || rec->type == TransactionRecord::RecvWithAddress || rec->type == TransactionRecord::MNReward) {
         tooltip += QString(" ") + formatTxToAddress(rec, true);
@@ -508,7 +507,7 @@ QVariant TransactionTableModel::data(const QModelIndex& index, int role) const
     case Qt::DecorationRole:
         switch (index.column()) {
         case Status:
-            return txStatusDecoration(rec);
+            return txAddressDecoration(rec);
         case Watchonly:
             return txWatchonlyDecoration(rec);
         case ToAddress:

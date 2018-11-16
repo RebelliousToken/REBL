@@ -85,7 +85,7 @@ QString BitcoinUnits::description(int unit)
         case REBL:
             return QString("REBL");
 //        case mREBL:
-//            return QString("Milli-REBL (1 / 1" THIN_SP_UTF8 "000)");
+//            return QString("MilliREBL");
 //        case uREBL:
 //            return QString("Micro-REBL (1 / 1" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
         default:
@@ -165,6 +165,19 @@ QString BitcoinUnits::format(int unit, const CAmount& nIn, bool fPlus, Separator
         return quotient_str;
 
     return quotient_str + QString(".") + remainder_str;
+}
+
+QString BitcoinUnits::simpleFormat(int unit, const CAmount& amount, bool plussign, SeparatorStyle separators, int decimalsWidth)
+{
+    QString result = format(unit, amount, plussign, separators);
+    int pos = result.lastIndexOf(QChar('.'));
+    result = result.left(pos + decimalsWidth+1);
+    return result;
+}
+
+QString BitcoinUnits::simpleFormatWithUnit(int unit, const CAmount& amount, bool plussign, SeparatorStyle separators, int decimalsWidth)
+{
+    return simpleFormat(unit, amount, plussign, separators, decimalsWidth) + QString(" ") + name(unit);
 }
 
 

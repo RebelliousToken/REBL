@@ -12,6 +12,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 
+#include "../primitives/transaction.h"
+
 class CMasternodeConfig;
 extern CMasternodeConfig masternodeConfig;
 
@@ -27,6 +29,7 @@ public:
 		std::string privKey;
 		std::string txHash;
 		std::string outputIndex;
+		CTxIn vin;
 
 	public:
 
@@ -77,6 +80,14 @@ public:
 
 		void setIp(const std::string& ip) {
 			this->ip = ip;
+		}
+
+		const CTxIn& getVin() const {
+			return vin;
+		}
+
+		void setVin(const CTxIn& vin) {
+			this->vin = vin;
 		}
 	};
 

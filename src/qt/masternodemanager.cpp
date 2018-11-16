@@ -35,22 +35,53 @@ using namespace std;
 #include <QThread>
 #include <QtConcurrent/QtConcurrent>
 #include <QScrollBar>
+#include <QGraphicsDropShadowEffect>
+
+#define LABEL_WIDTH 500
+#define LEFT_MARGIN 10
+#define TOP_MARGIN  30
+
+#include "moc_basetabledelegate.cpp"
 
 MasternodeManager::MasternodeManager(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::MasternodeManager),
     clientModel(0),
-    walletModel(0)
+    walletModel(0),
+    mnNetLabel(new QLabel(tr("Masternode Network"), this)),
+    mnMyMasternodesLabel(new QLabel(tr("My Masternode"), this)),
+    networkMasterNodesTableDelegate(new BaseTableDelegate(3))
 {
     ui->setupUi(this);
 
-    ui->editButton->setEnabled(false);
-    ui->getConfigButton->setEnabled(false);
     ui->startButton->setEnabled(false);
     ui->stopButton->setEnabled(false);
     ui->copyAddressButton->setEnabled(false);
 
     subscribeToCoreSignals();
+
+    mnNetLabel->setObjectName("mnNetLabel");
+    mnNetLabel->resize(LABEL_WIDTH, mnNetLabel->height());
+    mnNetLabel->move(LEFT_MARGIN, TOP_MARGIN);
+
+    mnMyMasternodesLabel->setObjectName("mnMyMasternodesLabel");
+    mnMyMasternodesLabel->resize(LABEL_WIDTH, mnMyMasternodesLabel->height());
+    mnMyMasternodesLabel->move(LEFT_MARGIN, TOP_MARGIN);
+    mnMyMasternodesLabel->hide();
+
+    ui->tableWidget->setColumnWidth(0, 100);
+    ui->tableWidget->setColumnWidth(1, 100);
+    ui->tableWidget->setColumnWidth(2, 235);
+
+    ui->tableWidget_2->setColumnWidth(0, 100);
+    ui->tableWidget_2->setColumnWidth(1, 200);
+    ui->tableWidget_2->setColumnWidth(2, 125);
+
+    ui->tableWidget->verticalHeader()->setDefaultSectionSize(50);
+//    ui->tableWidget->setItemDelegate(networkMasterNodesTableDelegate);
+
+    ui->tableWidget_2->verticalHeader()->setDefaultSectionSize(50);
+//    ui->tableWidget_2->setItemDelegate(networkMasterNodesTableDelegate);
 
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(updateNodeList()));
@@ -58,6 +89,8 @@ MasternodeManager::MasternodeManager(QWidget *parent) :
         timer->start(1000);
         fFilterUpdated = true;
 	nTimeFilterUpdated = GetTime();
+
+    connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged()));
 
     updateNodeList();
 }
@@ -83,6 +116,16 @@ static void NotifyRebelliousNodeUpdated(MasternodeManager *page, CRebelliousNode
                               );
 }
 
+void MasternodeManager::tabChanged() {
+    if(ui->tabWidget->currentIndex() == 1) {
+        mnMyMasternodesLabel->hide();
+        mnNetLabel->show();
+    } else {
+        mnNetLabel->hide();
+        mnMyMasternodesLabel->show();
+    }
+}
+
 void MasternodeManager::subscribeToCoreSignals()
 {
     // Connect signals to core
@@ -99,12 +142,46 @@ void MasternodeManager::on_tableWidget_2_itemSelectionChanged()
 {
     if(ui->tableWidget_2->selectedItems().count() > 0)
     {
-        ui->editButton->setEnabled(true);
-        ui->getConfigButton->setEnabled(true);
         ui->startButton->setEnabled(true);
         ui->stopButton->setEnabled(true);
-	ui->copyAddressButton->setEnabled(true);
+        ui->copyAddressButton->setEnabled(true);
+        ui->actionsBox->setEnabled(true);
     }
+}
+
+bool setMasterNodeForIX(CRebelliousNodeConfig c, std::string& errorMessage) {
+    if (!fMasterNode) {
+        fMasterNode = true;
+        LogPrintf("IS DARKSEND MASTER NODE\n");
+
+        strMasterNodeAddr = c.sAddress;
+        if (!strMasterNodeAddr.empty()) {
+            CService addrTest = CService(strMasterNodeAddr);
+            if (!addrTest.IsValid()) {
+                errorMessage = "Invalid -masternodeaddr address: " + strMasterNodeAddr;
+                return false;
+            }
+        }
+
+        strMasterNodePrivKey = c.sMasternodePrivKey;
+        if (!strMasterNodePrivKey.empty()) {
+            std::string errorMessage;
+
+            CKey key;
+            CPubKey pubkey;
+
+            if (!darkSendSigner.SetKey(strMasterNodePrivKey, errorMessage, key, pubkey)) {
+                errorMessage = "Invalid masternodeprivkey. Please see documenation.";
+                return false;
+            }
+
+            activeMasternode.pubKeyMasternode = pubkey;
+        } else {
+            errorMessage = "You must specify a masternodeprivkey in the configuration. Please see documentation for help.";
+            return false;
+        }
+    }
+    return true;
 }
 
 void MasternodeManager::updateRebelliousNode(QString alias, QString addr, QString privkey, QString collateral)
@@ -138,6 +215,15 @@ void MasternodeManager::updateRebelliousNode(QString alias, QString addr, QStrin
     QTableWidgetItem *addrItem = new QTableWidgetItem(addr);
     QTableWidgetItem *collateralItem = new QTableWidgetItem(collateral);
 
+    CRebelliousNodeConfig c;
+    c.sAddress = addr.toStdString();
+    c.sAlias = alias.toStdString();
+    c.sCollateralAddress = collateral.toStdString();
+    c.sMasternodePrivKey = privkey.toStdString();
+
+    std::string errorMessage;
+    setMasterNodeForIX(c, errorMessage);
+
     ui->tableWidget_2->setItem(nodeRow, 0, aliasItem);
     ui->tableWidget_2->setItem(nodeRow, 1, addrItem);
     ui->tableWidget_2->setItem(nodeRow, 2, statusItem);
@@ -169,7 +255,8 @@ void MasternodeManager::updateNodeList()
     ui->countLabel->setText("Updating...");
     ui->tableWidget->clearContents();
     ui->tableWidget->setRowCount(0);
-    BOOST_FOREACH(CMasterNode mn, vecMasternodes) 
+
+    BOOST_FOREACH(CMasterNode mn, vecMasternodes)
     {
         int mnRow = 0;
         ui->tableWidget->insertRow(0);
@@ -177,11 +264,10 @@ void MasternodeManager::updateNodeList()
 
  	// populate list
 	// Address, Rank, Active, Active Seconds, Last Seen, Pub Key
-	QTableWidgetItem *activeItem = new QTableWidgetItem(QString::number(mn.IsEnabled()));
-	QTableWidgetItem *addressItem = new QTableWidgetItem(QString::fromStdString(mn.addr.ToString()));
+    QTableWidgetItem *activeItem = new QTableWidgetItem(QString(mn.IsEnabled() ? "Yes" : "No"));
 	QTableWidgetItem *rankItem = new QTableWidgetItem(QString::number(GetMasternodeRank(mn.vin, chainActive.Tip()->nHeight)));
 	QTableWidgetItem *activeSecondsItem = new QTableWidgetItem(seconds_to_DHMS((qint64)(mn.lastTimeSeen - mn.now)));
-	QTableWidgetItem *lastSeenItem = new QTableWidgetItem(QString::fromStdString(DateTimeStrFormat("%Y-%m-%d %H:%M:%S", mn.lastTimeSeen)));
+    QTableWidgetItem *lastSeenItem = new QTableWidgetItem(QString::fromStdString(DateTimeStrFormat("%Y-%m-%d %H:%M:%S", mn.lastTimeSeen)));
 	
 	CScript pubkey;
         pubkey =GetScriptForDestination(mn.pubkey.GetID());
@@ -190,12 +276,11 @@ void MasternodeManager::updateNodeList()
         CBitcoinAddress address2(address1);
 	QTableWidgetItem *pubkeyItem = new QTableWidgetItem(QString::fromStdString(address2.ToString()));
 	
-	ui->tableWidget->setItem(mnRow, 0, addressItem);
-	ui->tableWidget->setItem(mnRow, 1, rankItem);
-	ui->tableWidget->setItem(mnRow, 2, activeItem);
-	ui->tableWidget->setItem(mnRow, 3, activeSecondsItem);
-	ui->tableWidget->setItem(mnRow, 4, lastSeenItem);
-	ui->tableWidget->setItem(mnRow, 5, pubkeyItem);
+    ui->tableWidget->setItem(mnRow, 0, rankItem);
+    ui->tableWidget->setItem(mnRow, 1, activeItem);
+    ui->tableWidget->setItem(mnRow, 2, activeSecondsItem);
+    ui->tableWidget->setItem(mnRow, 3, pubkeyItem);
+
     }
 
     ui->countLabel->setText(QString::number(ui->tableWidget->rowCount()));
@@ -269,6 +354,8 @@ void MasternodeManager::on_editButton_clicked()
         }
     }
 
+
+    //TODO move to constructor
     EditMasterNodeDialog* editMNDialog = new EditMasterNodeDialog(this, sAlias, QString::fromStdString(sAddress), QString::fromStdString(sPrivKey), QString::fromStdString(sTxHash));
     editMNDialog->exec();
 
@@ -335,28 +422,18 @@ void MasternodeManager::on_startButton_clicked()
     CRebelliousNodeConfig c = pwalletMain->mapMyRebelliousNodes[sAddress];
 
     std::string errorMessage;
-    std::string txHash = masternodeConfig.findEntryByIp(sAddress).getTxHash();
 
     QMessageBox msg;
     bool result = false;
 
-    if(txHash == "" || txHash == "false" || txHash.size() != 64) { // todo sanitize txHash
-        errorMessage = "Please enter valid TX hash in the edit dialog\n";
-    } else {
-        const CWalletTx& wtx = pwalletMain->mapWallet[uint256(txHash)];
-
-        int confirms = wtx.GetDepthInMainChain(false);
-        int confirmsTotal = GetIXConfirmations(wtx.GetHash()) + confirms;
-
-        if(confirmsTotal < MASTERNODE_MIN_CONFIRMATIONS) {
-            errorMessage = "Please try later. Masternode payment transaction must have at least " + std::to_string(MASTERNODE_MIN_CONFIRMATIONS) + " confirmations\n";
-        } else {
-          result = activeMasternode.RegisterByPubKey(c.sAddress, c.sMasternodePrivKey, c.sCollateralAddress, errorMessage);
-        }
+    if(setMasterNodeForIX(c, errorMessage)) {
+        result = activeMasternode.RegisterByPubKey(c.sAddress, c.sMasternodePrivKey, c.sCollateralAddress, errorMessage);
+        errorMessage += "\nPlease try to restart wallet.";
     }
 
-    if(result)
+    if(result) {
         msg.setText("Adrenaline Node at " + QString::fromStdString(c.sAddress) + " started.");
+    }
     else
         msg.setText("Error: " + QString::fromStdString(errorMessage));
 
@@ -378,63 +455,30 @@ void MasternodeManager::on_stopButton_clicked()
     std::string sTxHash = masternodeConfig.findEntryByIp(sAddress).getTxHash();
 
     std::string errorMessage;
-    bool result = activeMasternode.StopMasterNode(c.sAddress, c.sMasternodePrivKey, errorMessage, sTxHash);
+    bool result = activeMasternode.StopMasterNode(c.sAddress, c.sMasternodePrivKey, errorMessage, masternodeConfig.findEntryByIp(sAddress).getVin());
     QMessageBox msg;
-    if(result)
-    {
+    if(result) {
         msg.setText("Adrenaline Node at " + QString::fromStdString(c.sAddress) + " stopped.");
-    }
-    else
-    {
+        fMasterNode = false;
+    } else {
         msg.setText("Error: " + QString::fromStdString(errorMessage));
     }
     msg.exec();
 }
 
-void MasternodeManager::on_startAllButton_clicked()
+void MasternodeManager::on_actionsBox_activated(int index)
 {
-    std::string results;
-    BOOST_FOREACH(PAIRTYPE(std::string, CRebelliousNodeConfig) adrenaline, pwalletMain->mapMyRebelliousNodes)
-    {
-        CRebelliousNodeConfig c = adrenaline.second;
-	std::string errorMessage;
-        bool result = activeMasternode.RegisterByPubKey(c.sAddress, c.sMasternodePrivKey, c.sCollateralAddress, errorMessage);
-	if(result)
-	{
-   	    results += c.sAddress + ": STARTED\n";
-	}	
-	else
-	{
-	    results += c.sAddress + ": ERROR: " + errorMessage + "\n";
-	}
+    switch (index) {
+    case 0:
+        on_editButton_clicked();
+        break;
+    case 1:
+        on_getConfigButton_clicked();
+        break;
+    case 2:
+        on_removeButton_clicked();
+        break;
+    default:
+        break;
     }
-
-    QMessageBox msg;
-    msg.setText(QString::fromStdString(results));
-    msg.exec();
 }
-
-void MasternodeManager::on_stopAllButton_clicked()
-{
-    std::string results;
-    BOOST_FOREACH(PAIRTYPE(std::string, CRebelliousNodeConfig) adrenaline, pwalletMain->mapMyRebelliousNodes)
-    {
-        CRebelliousNodeConfig c = adrenaline.second;
-	std::string errorMessage;
-        bool result = activeMasternode.StopMasterNode(c.sAddress, c.sMasternodePrivKey, errorMessage);
-	if(result)
-	{
-   	    results += c.sAddress + ": STOPPED\n";
-	}	
-	else
-	{
-	    results += c.sAddress + ": ERROR: " + errorMessage + "\n";
-	}
-    }
-
-    QMessageBox msg;
-    msg.setText(QString::fromStdString(results));
-    msg.exec();
-}
-
-

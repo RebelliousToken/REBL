@@ -14,7 +14,7 @@ static const int MODEL_UPDATE_DELAY = 250;
 static const int MAX_PASSPHRASE_SIZE = 1024;
 
 /* Rebellious GUI -- Size of icons in status bar */
-static const int STATUSBAR_ICONSIZE = 16;
+static const int STATUSBAR_ICONSIZE = 20;
 
 /* Invalid field background style */
 #define STYLE_INVALID "background:#FF8080"
@@ -33,6 +33,7 @@ static const int STATUSBAR_ICONSIZE = 16;
 #define COLOR_BLACK QColor(51, 51, 51)
 /* Transaction list -- TX status decoration - default color */
 #define COLOR_GREEN QColor(55, 190, 114)
+#define COLOR_BLUE QColor(0, 164, 179)
 
 /* Tooltips longer than this (in characters) are converted into rich text,
    so that they can be word-wrapped.

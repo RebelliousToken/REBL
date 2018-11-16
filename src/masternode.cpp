@@ -6,7 +6,9 @@
 #include "util.h"
 #include "addrman.h"
 #include <boost/lexical_cast.hpp>
+
 //tt
+
 
 int CMasterNode::minProtoVersion = MIN_MN_PROTO_VERSION;
 
@@ -26,6 +28,10 @@ std::map<CNetAddr, int64_t> askedForMasternodeList;
 std::map<COutPoint, int64_t> askedForMasternodeListEntry;
 // cache block hashes as we calculate them
 std::map<int64_t, uint256> mapCacheBlockHashes;
+
+std::map<NodeId, MnPingInfo> mapMnPing;
+
+extern std::string myIp;
 
 // manage the masternode connections
 void ProcessMasternodeConnections(){
@@ -148,7 +154,7 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
             return;
         }
 
-        if(fDebug) LogPrintf("dsee - Got NEW masternode entry %s\n", addr.ToString().c_str());
+        if(fDebug) LogPrintf("dsee - Got NEW masternode entry %s from %s\n", addr.ToString().c_str(), pfrom->addrName);
 
         // make sure it's still unspent
         //  - this is checked later by .check() in many places and by ThreadCheckDarkSendPool()
@@ -171,6 +177,10 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
 
             // use this as a peer
             addrman.Add(CAddress(addr), pfrom->addr, 2*60*60);
+
+            if (!ConnectNode((CAddress)addr, NULL)) {
+                if (fDebug) LogPrintf("dsee - Could not connect to %s or already present\n", addr.ToString());
+            }
 
             // add our masternode
             CMasterNode mn(addr, vin, pubkey, vchSig, sigTime, pubkey2, protocolVersion);
@@ -385,7 +395,30 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
         if(masternodePayments.AddWinningMasternode(winner)){
             masternodePayments.Relay(winner);
         }
-    }
+    } /*else if (strCommand == "mnping") {
+        isMasternodeCommand = true;
+
+        uint64_t nonce;
+
+        vRecv >> nonce;
+
+        pfrom->PushMessage("mnpong", nonce);
+
+        if(fDebug) LogPrintf("mnping - received from %d with nonce %d\n", pfrom->GetId(), nonce);
+
+    } else if (strCommand == "mnpong") {
+        isMasternodeCommand = true;
+
+        uint64_t nonce;
+        std::map<NodeId, MnPingInfo>::iterator it;
+
+        vRecv >> nonce;
+
+        it = mapMnPing.find(pfrom->GetId());
+        if(it != mapMnPing.end() && (*it).second.nonce == nonce) mapMnPing.erase(it);
+
+        if(fDebug) LogPrintf("mnpong - received from %d with nonce %d\n", pfrom->GetId(), nonce);
+    }*/
 }
 
 struct CompareValueOnly
@@ -592,6 +625,7 @@ uint256 CMasterNode::CalculateScore(int mod, int64_t nBlockHeight)
 
 void CMasterNode::Check()
 {
+    LOCK(cs_masternodes);
     //once spent, stop doing the checks
     if(enabled == 3 || enabled == 4) return;
 
@@ -606,6 +640,16 @@ void CMasterNode::Check()
         return;
     }
 
+    if(fDebug) LogPrintf("CMasterNode::Check(): MN %s checking, myIp: %s \n", ((CNetAddr)this->addr).ToString(), myIp);
+
+    if(FindNode(((CNetAddr)this->addr).ToString(), true) == nullptr) {
+        if(fDebug) LogPrintf("CMasterNode::Check(): MN %s checking IS NULL \n", ((CNetAddr)this->addr).ToString());
+        if(((CNetAddr)this->addr).ToString() != myIp) {
+            this->Disable();
+            if(fDebug) LogPrintf("CMasterNode::Check(): MN %s stopped by ping\n", ((CNetAddr)this->addr).ToString());
+            return;
+        }
+    }
 
     if(!unitTest){
         CValidationState state;

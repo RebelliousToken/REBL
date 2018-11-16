@@ -69,8 +69,6 @@
 
 const QString BitcoinGUI::DEFAULT_WALLET = "~Default";
 
-
-
 BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMainWindow(parent),
                                                                             clientModel(0),
                                                                             walletFrame(0),
@@ -79,11 +77,12 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
                                                                             labelEncryptionIcon(0),
                                                                             labelConnectionsIcon(0),
                                                                             labelBlocksIcon(0),
+                                                                            labelBalance(0),
                                                                             progressBarLabel(0),
                                                                             progressBar(0),
                                                                             progressDialog(0),
                                                                             appMenuBar(0),
-									    									smartToken(0),
+                                                                            smartToken(0),
                                                                             overviewAction(0),
                                                                             historyAction(0),
                                                                             stakingAction(0),
@@ -114,18 +113,18 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
                                                                             rpcConsole(0),
                                                                             explorerWindow(0),
                                                                             prevBlocks(0),
-                                                                            spinnerFrame(0)
+                                                                            spinnerFrame(0),
+                                                                            statusTipLabel(0)
 {
     /* Open CSS when configured */
     this->setStyleSheet(GUIUtil::loadStyleSheet());
-//    int id = QFontDatabase::addApplicationFont(":/res/fonts/muli/muli-regular.ttf"); //путь к шрифту
-//        QString family = QFontDatabase::applicationFontFamilies(id).at(0); //имя шрифта
-//        QFont f(family);  // QFont c вашим шрифтом
     QFontDatabase fontDB;
         fontDB.addApplicationFont(":/res/fonts/poppins/Poppins-Regular.ttf");
 
-    resize(1185, 735);
+    resize(1450, 735);
     QString windowTitle = tr("Rebellious") + " - ";
+    labelBalance = new QLabel;
+    labelBalance->setObjectName("labelCurrentBalance");
 
 #ifdef ENABLE_WALLET
     /* if compiled with wallet support, -disablewallet can still disable the wallet */
@@ -160,6 +159,7 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
     if (enableWallet) {
         /** Create wallet frame*/
         walletFrame = new WalletFrame(this);
+        walletFrame->setStyleSheet("font-size:14px;");
         explorerWindow = new BlockExplorer(this);
     } else
 #endif // ENABLE_WALLET
@@ -185,65 +185,6 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
 
     // Create system tray icon and notification
     createTrayIcon(networkStyle);
-
-    // Create status bar
-    statusBar();
-
-    // Status bar notification icons
-    QFrame* frameBlocks = new QFrame();
-    frameBlocks->setContentsMargins(0, 0, 0, 0);
-    frameBlocks->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
-    frameBlocks->setStyleSheet("border: 0px solid #ff0000");
-
-    QHBoxLayout* frameBlocksLayout = new QHBoxLayout(frameBlocks);
-    frameBlocksLayout->setContentsMargins(6, 0, 6, 0);
-    frameBlocksLayout->setSpacing(6);
-    unitDisplayControl = new UnitDisplayStatusBarControl();
-    labelStakingIcon = new QLabel();
-    labelEncryptionIcon = new QLabel();
-    labelConnectionsIcon = new QPushButton();
-    labelConnectionsIcon->setFlat(true); // Make the button look like a label, but clickable
-    labelConnectionsIcon->setStyleSheet(".QPushButton { background-color: rgba(255, 255, 255, 0);}");
-    labelConnectionsIcon->setMaximumSize(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE);
-    labelBlocksIcon = new QLabel();
-
-    if (enableWallet) {
-        frameBlocksLayout->addStretch();
-//        frameBlocksLayout->addWidget(unitDisplayControl);
-        frameBlocksLayout->addStretch();
-        frameBlocksLayout->addWidget(labelEncryptionIcon);
-    }
-    frameBlocksLayout->addStretch();
-    frameBlocksLayout->addWidget(labelStakingIcon);
-    frameBlocksLayout->addStretch();
-    frameBlocksLayout->addWidget(labelConnectionsIcon);
-    frameBlocksLayout->addStretch();
-    frameBlocksLayout->addWidget(labelBlocksIcon);
-    frameBlocksLayout->addStretch();
-
-    // Progress bar and label for blocks download
-    progressBarLabel = new QLabel();
-    progressBarLabel->setVisible(true);
-    progressBarLabel->setStyleSheet("color: #ffffff; margin-left: 20px; margin-right: 20px; border: 0px solid #FFF;");
-
-    unitDisplayControl->setStyleSheet("width:1px;height:1px;color:transparent;border:1px solid red;");
-
-    progressBar = new GUIUtil::ProgressBar();
-    progressBar->setAlignment(Qt::AlignCenter);
-    progressBar->setStyleSheet("border: 0px solid #ff0000;");
-    progressBar->setVisible(true);
-
-    // Override style sheet for progress bar for styles that have a segmented progress bar,
-    // as they make the text unreadable (workaround for issue #1071)
-    // See https://qt-project.org/doc/qt-4.8/gallery.html
-    QString curStyle = QApplication::style()->metaObject()->className();
-    if (curStyle == "QWindowsStyle" || curStyle == "QWindowsXPStyle") {
-        
-    }
-
-    statusBar()->addWidget(progressBarLabel);
-    statusBar()->addWidget(progressBar);
-    statusBar()->addPermanentWidget(frameBlocks);
 
     // Jump directly to tabs in RPC-console
     connect(openInfoAction, SIGNAL(triggered()), rpcConsole, SLOT(showInfo()));
@@ -296,6 +237,16 @@ BitcoinGUI::~BitcoinGUI()
 #endif
 }
 
+void BitcoinGUI::setEffect(QGraphicsEffect *effect) {
+    this->setGraphicsEffect(effect);
+}
+
+void BitcoinGUI::setBalance(const CAmount& balance, const CAmount& unconfirmedBalance, const CAmount& immatureBalance, const CAmount& anonymizedBalance, const CAmount& watchOnlyBalance, const CAmount& watchUnconfBalance, const CAmount& watchImmatureBalance)
+{
+    const int decimalsWidth = 2;
+    labelBalance->setText(BitcoinUnits::simpleFormatWithUnit(0, balance + unconfirmedBalance, false, BitcoinUnits::separatorAlways, decimalsWidth));
+}
+
 void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
 {
     QActionGroup* tabGroup = new QActionGroup(this);
@@ -329,7 +280,7 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
 
     //TODO clear QAction()
     receiveCoinsAction = new QAction(QIcon(), tr("&RECEIVE"), this);
-    receiveCoinsAction->setStatusTip(tr("Request payments (generates QR codes and rebellious: URIs)"));
+    receiveCoinsAction->setStatusTip(tr("Request payments"));
     receiveCoinsAction->setToolTip(receiveCoinsAction->statusTip());
     receiveCoinsAction->setCheckable(true);
 #ifdef Q_OS_MAC
@@ -339,7 +290,7 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
 #endif
     tabGroup->addAction(receiveCoinsAction);
 
-	// Qt::Key_4 is reserved for Staking tab
+    // Qt::Key_4 is reserved for Staking tab
 
     //TODO clear QAction()
     historyAction = new QAction(QIcon(), tr("&TRANSACTIONS"), this);
@@ -352,7 +303,7 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
     historyAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_5));
 #endif
     tabGroup->addAction(historyAction);
-    
+
     //TODO clear QAction()
     stakingAction = new QAction(QIcon(), tr("&STAKING"), this);
     stakingAction->setStatusTip(tr("Show your staking capacity"));
@@ -406,7 +357,7 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
     #else
         smartToken->setShortcut(QKeySequence(Qt::ALT + Qt::Key_8));
     #endif
-    
+
     tabGroup->addAction(smartToken);
     }
 
@@ -585,48 +536,135 @@ void BitcoinGUI::createToolBars()
 {
     if (walletFrame) {
         QToolBar* toolbar = new QToolBar(tr("Tabs toolbar"));
-        QLabel *label = new QLabel;
-        label->setObjectName(QStringLiteral("logoWidget"));
-        label->setPixmap(QPixmap(":/images/logo-rebl"));
-        toolbar->addWidget(label);
+        QLabel *labelLogo = new QLabel;
+        QLabel *labelCurrentBalanceText = new QLabel(tr("Current Balance"));
+        labelCurrentBalanceText->setObjectName("labelCurrentBalanceText");
+#if Q_OS_WIN
+    toolbar->setStyleSheet("font-size:14px");
+#endif
+
+        labelLogo->setObjectName(QString("logoWidget"));
+        labelLogo->setPixmap(QPixmap(":/images/logo-rebl"));
         toolbar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         toolbar->addAction(overviewAction);
         toolbar->addAction(sendCoinsAction);
         toolbar->addAction(receiveCoinsAction);
         toolbar->addAction(historyAction);
-//        toolbar->addAction(stakingAction);
-//        toolbar->addAction(tradingAction);
         QSettings settings;
         if (settings.value("fShowMasternodesTab").toBool()) {
             toolbar->addAction(masternodeAction);
         }
-
 
         QGraphicsDropShadowEffect *labelBalanceText = new QGraphicsDropShadowEffect();
         labelBalanceText->setBlurRadius(20);
         labelBalanceText->setColor(0xAAAAAA);
         labelBalanceText->setOffset(0);
 
-        toolbar->setGraphicsEffect(labelBalanceText);
-
-
-//        toolbar->addAction(smartToken);
         toolbar->setMovable(false); // remove unused icon in upper left corner
         overviewAction->setChecked(true);
 
         /** Create additional container for toolbar and walletFrame and make it the central widget.
             This is a workaround mostly for toolbar styling on Mac OS but should work fine for every other OSes too.
         */
-		
-        QVBoxLayout* layout = new QVBoxLayout;
-        layout->addWidget(toolbar);
+
+        // Status bar notification icons
+        QFrame* frameBlocks = new QFrame();
+        frameBlocks->setContentsMargins(0, 0, 0, 0);
+        frameBlocks->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+        frameBlocks->setStyleSheet("{border: none;} \n QToolTip {color: #333; background-color:#fff;}");
+
+        QHBoxLayout* frameBlocksLayout = new QHBoxLayout(frameBlocks);
+        frameBlocksLayout->setContentsMargins(50, 0, 30, 0);
+        frameBlocksLayout->setSpacing(6);
+        unitDisplayControl = new UnitDisplayStatusBarControl();
+        labelStakingIcon = new QLabel();
+        labelEncryptionIcon = new QLabel();
+        labelConnectionsIcon = new QPushButton();
+        labelConnectionsIcon->setFlat(true); // Make the button look like a label, but clickable
+        labelConnectionsIcon->setStyleSheet(".QPushButton { background-color: rgba(255, 255, 255, 0);}");
+        labelConnectionsIcon->setMaximumSize(40, 40);
+        labelBlocksIcon = new QLabel();
+
+        if (enableWallet) {
+            frameBlocksLayout->addStretch();
+            frameBlocksLayout->addStretch();
+            frameBlocksLayout->addWidget(labelEncryptionIcon);
+        }
+        frameBlocksLayout->addStretch();
+        frameBlocksLayout->addWidget(labelStakingIcon);
+        frameBlocksLayout->addStretch();
+        frameBlocksLayout->addItem(new QSpacerItem(10, 0, QSizePolicy::Expanding,QSizePolicy::Preferred));
+        frameBlocksLayout->addWidget(labelConnectionsIcon);
+        frameBlocksLayout->addStretch();
+        frameBlocksLayout->addWidget(labelBlocksIcon);
+        frameBlocksLayout->addStretch();
+
+        QFrame* frameSyncStatus = new QFrame();
+        QVBoxLayout* syncFrameLayout = new QVBoxLayout(frameSyncStatus);
+
+        // Progress bar and label for blocks download
+        progressBarLabel = new QLabel();
+        progressBarLabel->setVisible(true);
+        progressBarLabel->setObjectName("progressBarLabel");
+
+        unitDisplayControl->setStyleSheet("width:1px;height:1px;color:transparent;border:1px solid red;");
+
+        progressBar = new GUIUtil::ProgressBar();
+        progressBar->setAlignment(Qt::AlignCenter);
+        progressBar->setVisible(true);
+
+        // Override style sheet for progress bar for styles that have a segmented progress bar,
+        // as they make the text unreadable (workaround for issue #1071)
+        // See https://qt-project.org/doc/qt-4.8/gallery.html
+        QString curStyle = QApplication::style()->metaObject()->className();
+        if (curStyle == "QWindowsStyle" || curStyle == "QWindowsXPStyle") {
+
+        }
+
+        syncFrameLayout->addWidget(progressBar);
+        syncFrameLayout->addWidget(progressBarLabel);
+
+        statusTipLabel = new QLabel();
+        statusTipLabel->setStyleSheet("padding-left:5px;font-size:14px;");
+
+        QVBoxLayout* vl = new QVBoxLayout;
+        vl->setSpacing(0);
+        vl->setContentsMargins(QMargins());
+        vl->addWidget(labelLogo);
+        vl->addStretch();
+        vl->addWidget(labelCurrentBalanceText);
+        vl->addWidget(labelBalance);
+        vl->addStretch();
+        vl->addWidget(toolbar);
+        vl->addStretch();
+        vl->addStretch();
+        vl->addStretch();
+        vl->addWidget(statusTipLabel);
+        vl->addWidget(progressBar);
+        vl->addWidget(progressBarLabel);
+        vl->addWidget(frameBlocks);
+
+        QWidget* qw = new QWidget();
+        qw->setObjectName("leftWidget");
+        qw->setMaximumWidth(250);
+        labelLogo->setFixedWidth(300);
+        toolbar->setFixedWidth(250);
+        qw->setLayout(vl);
+
+        QHBoxLayout* layout = new QHBoxLayout;
+        toolbar->setOrientation(Qt::Vertical);
+        QLayout* lay = toolbar->layout();
+        for(int i = 0; i < lay->count(); ++i)
+            lay->itemAt(i)->setAlignment(Qt::AlignLeft);
+        layout->addWidget(qw);
         layout->addWidget(walletFrame);
         layout->setSpacing(0);
         layout->setContentsMargins(QMargins());
         QWidget* containerWidget = new QWidget();
         containerWidget->setLayout(layout);
-		setMinimumSize(200, 200);
+        setMinimumSize(200, 200);
         setCentralWidget(containerWidget);
+
     }
 }
 
@@ -911,27 +949,13 @@ void BitcoinGUI::setNumConnections(int count)
     case 0:
         icon = ":/icons/connect_0";
         break;
-    case 1:
-    case 2:
-    case 3:
-        icon = ":/icons/connect_1";
-        break;
-    case 4:
-    case 5:
-    case 6:
-        icon = ":/icons/connect_2";
-        break;
-    case 7:
-    case 8:
-    case 9:
-        icon = ":/icons/connect_3";
-        break;
     default:
         icon = ":/icons/connect_4";
         break;
     }
     QIcon connectionItem = QIcon(icon).pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE);
     labelConnectionsIcon->setIcon(connectionItem);
+    labelConnectionsIcon->setIconSize(QSize(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
     labelConnectionsIcon->setToolTip(tr("%n active connection(s) to REBL network", "", count));
 }
 
@@ -968,7 +992,6 @@ void BitcoinGUI::setNumBlocks(int count)
     int secs = lastBlockDate.secsTo(currentDate);
 
     tooltip = tr("Processed %n blocks of transaction history.", "", count);
-
     // Set icon state: spinning if catching up, tick otherwise
     if (secs < 90*60) { // 90*60 for bitcoin but we are 4x times faster
 #ifdef ENABLE_WALLET
@@ -1155,13 +1178,17 @@ void BitcoinGUI::dropEvent(QDropEvent* event)
 
 bool BitcoinGUI::eventFilter(QObject* object, QEvent* event)
 {
-    // Catch status tip events
-    if (event->type() == QEvent::StatusTip) {
-        // Prevent adding text from setStatusTip(), if we currently use the status bar for displaying other stuff
-        if (progressBarLabel->isVisible() || progressBar->isVisible())
-            return true;
-    }
-    return QMainWindow::eventFilter(object, event);
+
+    if(event->type() != QEvent::StatusTip) return QMainWindow::eventFilter(object, event);
+
+    // Prevent adding text from setStatusTip(), if we currently use the status bar for displaying other stuff
+    if (progressBarLabel->isVisible() || progressBar->isVisible())
+        return true;
+
+    QStatusTipEvent* statusTipEvent = static_cast<QStatusTipEvent*>(event);
+    statusTipLabel->setText(statusTipEvent->tip());
+    statusTipEvent->ignore();
+    return true;
 }
 
 void BitcoinGUI::setStakingStatus()

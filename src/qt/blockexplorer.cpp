@@ -220,11 +220,12 @@ std::string BlockToString(CBlockIndex* pBlock)
     }
     TxContent += "</table>";
 
-    int64_t Generated;
-    if (pBlock->nHeight == 0)
+    int64_t Generated = GetProofOfStakeReward(0, 0, pBlock->nHeight);
+    if (pBlock->nHeight == 0) {
         Generated = OutVolume;
-    else
-        Generated = GetProofOfWorkReward(0, pBlock->nHeight - 1);
+    } else if(pBlock->nHeight <= 100) {
+        Generated = GetProofOfWorkReward(0, pBlock->nHeight);
+    }
 
     std::string BlockContentCells[] =
         {

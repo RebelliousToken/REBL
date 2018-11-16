@@ -13,6 +13,12 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="autoFillBackground">
+   <bool>false</bool>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background: #fcfcfc;</string>
+  </property>
   <layout class="QVBoxLayout" name="topLayout">
    <property name="leftMargin">
     <number>0</number>
@@ -34,150 +40,17 @@
      <item>
       <widget class="QTabWidget" name="tabWidget">
        <property name="styleSheet">
-        <string notr="true">background-color:#ffffff;</string>
+        <string notr="true">background-color:#fcfcfc;</string>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
-       <widget class="QWidget" name="tab">
-        <attribute name="title">
-         <string>Rebellious Masternodes Network</string>
-        </attribute>
-        <layout class="QGridLayout" name="gridLayout">
-         <item row="1" column="0">
-          <widget class="QTableWidget" name="tableWidget">
-           <property name="editTriggers">
-            <set>QAbstractItemView::NoEditTriggers</set>
-           </property>
-           <property name="alternatingRowColors">
-            <bool>true</bool>
-           </property>
-           <property name="selectionBehavior">
-            <enum>QAbstractItemView::SelectRows</enum>
-           </property>
-           <attribute name="horizontalHeaderStretchLastSection">
-            <bool>true</bool>
-           </attribute>
-           <column>
-            <property name="text">
-             <string>Address</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Rank</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Active</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Active (secs)</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Last Seen</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Pubkey</string>
-            </property>
-           </column>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QTableWidget" name="tableWidget_3">
-           <property name="editTriggers">
-            <set>QAbstractItemView::NoEditTriggers</set>
-           </property>
-           <property name="alternatingRowColors">
-            <bool>true</bool>
-           </property>
-           <property name="selectionBehavior">
-            <enum>QAbstractItemView::SelectRows</enum>
-           </property>
-           <property name="sortingEnabled">
-            <bool>true</bool>
-           </property>
-           <attribute name="horizontalHeaderStretchLastSection">
-            <bool>true</bool>
-           </attribute>
-           <column>
-            <property name="text">
-             <string>Address</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Rank</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Active</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Active (secs)</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Last Seen</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Pubkey</string>
-            </property>
-           </column>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_3">
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
-           <item>
-            <widget class="QLabel" name="label_2">
-             <property name="text">
-              <string>Rebellious Masternodes Activated:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="countLabel">
-             <property name="text">
-              <string>0</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </widget>
+       <property name="usesScrollButtons">
+        <bool>false</bool>
+       </property>
        <widget class="QWidget" name="tab_2">
         <attribute name="title">
-         <string>My Rebellious Masternode</string>
+         <string>MY MASTERNODES</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_2">
          <item row="0" column="0">
@@ -189,8 +62,16 @@
             <layout class="QHBoxLayout" name="horizontalLayout">
              <item>
               <widget class="QPushButton" name="createButton">
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
                <property name="styleSheet">
-                <string notr="true">background-color: #37BE72;</string>
+                <string notr="true">#createButton {
+background-color: #00A4B3;
+}
+#createButton:hover{ 
+    background-color: #00757F;
+}</string>
                </property>
                <property name="text">
                 <string>&amp;Create...</string>
@@ -199,11 +80,20 @@
              </item>
              <item>
               <widget class="QPushButton" name="copyAddressButton">
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
                <property name="styleSheet">
-                <string notr="true">background-color: #37BE72;</string>
+                <string notr="true">#copyAddressButton:hover {
+    background: #00A4B3;
+    color: #fff;
+}</string>
                </property>
                <property name="text">
                 <string>Copy &amp;Address</string>
+               </property>
+               <property name="default">
+                <bool>false</bool>
                </property>
               </widget>
              </item>
@@ -228,13 +118,16 @@
               <set>QAbstractItemView::NoEditTriggers</set>
              </property>
              <property name="alternatingRowColors">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
              <property name="selectionMode">
               <enum>QAbstractItemView::SingleSelection</enum>
              </property>
              <property name="selectionBehavior">
               <enum>QAbstractItemView::SelectRows</enum>
+             </property>
+             <property name="showGrid">
+              <bool>false</bool>
              </property>
              <attribute name="horizontalHeaderStretchLastSection">
               <bool>true</bool>
@@ -267,32 +160,40 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="QPushButton" name="editButton">
+              <widget class="QPushButton" name="startButton">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
                <property name="styleSheet">
-                <string notr="true">background-color: #37BE72;</string>
+                <string notr="true">#startButton {background-color: #00A4B3;}
+#startButton:hover{ 
+    background-color: #00757F;
+}
+#startButton:disabled {
+    background-color: #cccccc;
+}</string>
                </property>
                <property name="text">
-                <string>&amp;Edit</string>
+                <string>&amp;Start</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="getConfigButton">
+              <widget class="QPushButton" name="stopButton">
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
                <property name="styleSheet">
-                <string notr="true">background-color: #37BE72;</string>
+                <string notr="true">#stopButton:hover {
+    background: #00A4B3;
+    color: #fff;
+}</string>
                </property>
                <property name="text">
-                <string>&amp;Get Config</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="removeButton">
-               <property name="styleSheet">
-                <string notr="true">background-color: #37BE72;</string>
-               </property>
-               <property name="text">
-                <string>&amp;Remove</string>
+                <string>Sto&amp;p</string>
                </property>
               </widget>
              </item>
@@ -309,89 +210,144 @@
                </property>
               </spacer>
              </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_4">
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
              <item>
-              <widget class="QPushButton" name="startButton">
+              <widget class="QComboBox" name="actionsBox">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="styleSheet">
-                <string notr="true">background-color: #37BE72;</string>
+                <string notr="true">QComboBox {
+	width: 120px;
+}
+
+QListView {
+    border: 2px solid #E9E9E9;
+	 padding: 10px;
+	width: 120px;
+}
+
+QComboBox::item {
+    color:#00A4B3;
+	 text-transform: uppercase;
+}</string>
                </property>
-               <property name="text">
-                <string>&amp;Start</string>
+               <property name="currentIndex">
+                <number>3</number>
                </property>
+               <item>
+                <property name="text">
+                 <string>Edit</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Get config</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Remove</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Actions</string>
+                </property>
+               </item>
               </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="stopButton">
-               <property name="styleSheet">
-                <string notr="true">background-color: #37BE72;</string>
-               </property>
-               <property name="text">
-                <string>Sto&amp;p</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_4">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_5">
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QPushButton" name="startAllButton">
-               <property name="styleSheet">
-                <string notr="true">background-color: #37BE72;</string>
-               </property>
-               <property name="text">
-                <string>S&amp;tart All</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="stopAllButton">
-               <property name="styleSheet">
-                <string notr="true">background-color: #37BE72;</string>
-               </property>
-               <property name="text">
-                <string>St&amp;op All</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_5">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
              </item>
             </layout>
            </item>
           </layout>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tab">
+        <attribute name="title">
+         <string>NETWORK</string>
+        </attribute>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>Masternodes Active:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="countLabel">
+             <property name="text">
+              <string>0</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item row="1" column="0">
+          <widget class="QTableWidget" name="tableWidget">
+           <property name="editTriggers">
+            <set>QAbstractItemView::NoEditTriggers</set>
+           </property>
+           <property name="alternatingRowColors">
+            <bool>false</bool>
+           </property>
+           <property name="selectionMode">
+            <enum>QAbstractItemView::SingleSelection</enum>
+           </property>
+           <property name="selectionBehavior">
+            <enum>QAbstractItemView::SelectRows</enum>
+           </property>
+           <property name="showGrid">
+            <bool>false</bool>
+           </property>
+           <attribute name="horizontalHeaderDefaultSectionSize">
+            <number>150</number>
+           </attribute>
+           <attribute name="horizontalHeaderMinimumSectionSize">
+            <number>60</number>
+           </attribute>
+           <attribute name="horizontalHeaderStretchLastSection">
+            <bool>true</bool>
+           </attribute>
+           <column>
+            <property name="text">
+             <string>Rank</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Active</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Active time</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Pubkey</string>
+            </property>
+           </column>
+          </widget>
          </item>
         </layout>
        </widget>

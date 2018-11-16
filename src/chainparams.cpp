@@ -53,12 +53,12 @@ static void convertSeed6(std::vector<CAddress>& vSeedsOut, const SeedSpec6* data
 // + Contains no strange transactions
 static Checkpoints::MapCheckpoints mapCheckpoints =
     boost::assign::map_list_of
-            ( 0,   uint256("") ) //TODO here
+            ( 0,   uint256("0x189a48366f8d4c555cb3d051461a32890023a6a8c0ad36f8c87573883f0eac16") ) //TODO here
 ;
 
 static const Checkpoints::CCheckpointData data = {
     &mapCheckpoints,
-    1525365162, // * UNIX timestamp of last checkpoint block
+    1538581316, // * UNIX timestamp of last checkpoint block
     0,    // * total number of transactions between genesis and last checkpoint
                 //   (the tx=... number in the SetBestChain debug.log lines)
     2000        // * estimated number of transactions per day after checkpoint
@@ -118,11 +118,11 @@ public:
          * a large 4-byte int at any alignment.
          */
         pchMessageStart[0] = 0xcc;
-        pchMessageStart[1] = 0xda;
-        pchMessageStart[2] = 0xfe;
-        pchMessageStart[3] = 0x01;
+        pchMessageStart[1] = 0x11;
+        pchMessageStart[2] = 0xcc;
+        pchMessageStart[3] = 0xae;
         vAlertPubKey = ParseHex("");
-        nDefaultPort = /*28666*/ 12700;
+        nDefaultPort = /*28666*/ 13700;
         bnProofOfWorkLimit = ~uint256(0) >> 1; // REBL starting difficulty is 1 / 2^12
         nSubsidyHalvingInterval = 210000;
         nMaxReorganizationDepth = 100;
@@ -137,10 +137,10 @@ public:
         nMasternodeCountDrift = 20;
         nModifierUpdateBlock = 615800;
 
-        const char* pszTimestamp = ""; // Input Activation code to activate blockchain
+        const char* pszTimestamp = "3oct2018 - BBC: Sanctions on Iran: International Court of Justice rules against US"; // Input Activation code to activate blockchain
         CMutableTransaction txNew;
         txNew.nVersion = 1;
-        txNew.nTime = 1525365162;
+        txNew.nTime = 1538581316;
         txNew.nLockTime = 0;
         txNew.vin.resize(1);
         txNew.vout.resize(1);
@@ -153,7 +153,7 @@ public:
         genesis.nVersion = 1;
         genesis.nTime = txNew.nTime;
         genesis.nBits = bnProofOfWorkLimit.GetCompact();
-        genesis.nNonce = 1;
+        genesis.nNonce = 0;
 
         hashGenesisBlock = genesis.GetHash();
 
@@ -161,8 +161,8 @@ public:
             generateGenesis(genesis);
         }
 
-        assert(hashGenesisBlock == uint256(""));
-        assert(genesis.hashMerkleRoot == uint256(""));
+        assert(hashGenesisBlock == uint256("0x189a48366f8d4c555cb3d051461a32890023a6a8c0ad36f8c87573883f0eac16"));
+        assert(genesis.hashMerkleRoot == uint256("0x35acca379dc5f7a262607b5d7e41c65f4d8c5685fe4e1d03a9e176d4e17e4dc0"));
 
         vSeeds.push_back(CDNSSeedData("1", "")); // DNSSeed
 

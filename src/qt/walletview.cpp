@@ -47,30 +47,19 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
     stakingPage = new StakingDialog(this);
     tradingPage = new tradingDialog(this);
     QVBoxLayout* vbox = new QVBoxLayout();
-    QHBoxLayout* hbox_buttons = new QHBoxLayout();
     transactionView = new TransactionView(this);
     vbox->addWidget(transactionView);
-    QPushButton* exportButton = new QPushButton(tr("&Export"), this);
-    exportButton->setToolTip(tr("Export the data in the current tab to a file"));
-#ifndef Q_OS_MAC // Icons on push buttons are very uncommon on Mac
-    exportButton->setIcon(QIcon(":/icons/export"));
-#endif
-    hbox_buttons->addStretch();
 
     // Sum of selected transactions
     QLabel* transactionSumLabel = new QLabel();                // Label
     transactionSumLabel->setObjectName("transactionSumLabel"); // Label ID as CSS-reference
     transactionSumLabel->setText(tr("Selected amount:"));
-    hbox_buttons->addWidget(transactionSumLabel);
 
     transactionSum = new QLabel();                   // Amount
     transactionSum->setObjectName("transactionSum"); // Label ID as CSS-reference
     transactionSum->setMinimumSize(200, 8);
     transactionSum->setTextInteractionFlags(Qt::TextSelectableByMouse);
-    hbox_buttons->addWidget(transactionSum);
 
-    hbox_buttons->addWidget(exportButton);
-    vbox->addLayout(hbox_buttons);
     transactionsPage->setLayout(vbox);
     tradingPage->setLayout(vbox);
 
@@ -101,9 +90,6 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
 
     // Update wallet with sum of selected transactions
     connect(transactionView, SIGNAL(trxAmount(QString)), this, SLOT(trxAmount(QString)));
-
-    // Clicking on "Export" allows to export the transaction list
-    connect(exportButton, SIGNAL(clicked()), transactionView, SLOT(exportClicked()));
 
     // Pass through messages from sendCoinsPage
     connect(sendCoinsPage, SIGNAL(message(QString, QString, unsigned int)), this, SIGNAL(message(QString, QString, unsigned int)));

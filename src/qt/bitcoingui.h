@@ -90,6 +90,8 @@ private:
     QLabel* progressBarLabel;
     QProgressBar* progressBar;
     QProgressDialog* progressDialog;
+    QLabel* statusTipLabel;
+    QLabel* labelBalance;
 
     QMenuBar* appMenuBar;
     QAction* smartToken;
@@ -181,6 +183,10 @@ public slots:
     void message(const QString& title, const QString& message, unsigned int style, bool* ret = NULL);
 
     void setStakingStatus();
+
+    void setEffect(QGraphicsEffect *effect = NULL);
+
+    void setBalance(const CAmount& balance, const CAmount& unconfirmedBalance, const CAmount& immatureBalance, const CAmount& anonymizedBalance, const CAmount& watchOnlyBalance, const CAmount& watchUnconfBalance, const CAmount& watchImmatureBalance);
 
 #ifdef ENABLE_WALLET
     /** Set the encryption status as shown in the UI.

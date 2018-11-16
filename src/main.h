@@ -70,7 +70,7 @@ static const unsigned int DEFAULT_BLOCK_PRIORITY_SIZE = 50000;
 /** Default for accepting alerts from the P2P network. */
 static const bool DEFAULT_ALERTS = true;
 /** The maximum size for transactions we're willing to relay/mine */
-static const unsigned int MAX_STANDARD_TX_SIZE = MAX_BLOCK_SIZE_GEN/5;
+static const unsigned int MAX_STANDARD_TX_SIZE = MAX_BLOCK_SIZE_GEN/3;
 /** The maximum allowed number of signature check operations in a block (network rule) */
 static const unsigned int MAX_BLOCK_SIGOPS = MAX_BLOCK_SIZE / 50;
 /** Maximum number of signature check operations in an IsStandard() P2SH script */
@@ -121,10 +121,11 @@ static const unsigned char REJECT_DUST = 0x41;
 static const unsigned char REJECT_INSUFFICIENTFEE = 0x42;
 static const unsigned char REJECT_CHECKPOINT = 0x43;
 
-static const int64_t STATIC_POS_REWARD = 1 * COIN; //Constant reward 8%
+static const int64_t STATIC_MN_REWARD = 20 * COIN;
+static const int64_t STATIC_POS_REWARD = 40 * COIN;
 
 inline bool IsProtocolV2(int nHeight) { return IsTestNet() || nHeight > 0; }
-inline int64_t GetMNCollateral(int nHeight) { return nHeight<=30000 ? 16120 : 1999999; }
+inline int64_t GetMNCollateral(int nHeight) { return 100000; } //TODO discuss about sum
 
 struct BlockHasher {
     size_t operator()(const uint256& hash) const { return hash.GetLow64(); }

@@ -1608,46 +1608,83 @@ CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
     if (nHeight < 1) {
         nSubsidy = 1 * COIN;
     } else if (nHeight == 1) {
-        nSubsidy = 8000000 * COIN;
-    } else if (nHeight < 500) {
-        nSubsidy = 100 * COIN;
-    } else if (nHeight == 501) {
-        nSubsidy = 1000 * COIN;
-    } else if (nHeight < 1000000) {
-        nSubsidy = 10 * COIN;
-    } else if (nHeight < 1001000) {
-        nSubsidy = 30 * COIN;
-    } else if (nHeight < 5000000) {
-        nSubsidy = 10 * COIN;
-    } else if (nHeight < 6000000) {
-        nSubsidy = 10 * COIN;
+        nSubsidy = 325999921 * COIN;
     } else {
         nSubsidy = 1 * COIN;
-    }
-
-    if (nHeight < LAST_HEIGHT_FEE_BLOCK) {
-        nFees = nHeight;
     }
     return nSubsidy + nFees;
 }
 
 CAmount GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, int nHeight)
 {
-    CAmount nSubsidy = STATIC_POS_REWARD;
-
-    // First 100,000 blocks double stake for masternode ready
-    if (nHeight < 100000) {
-        nSubsidy = 3 * COIN;
+    CAmount nSubsidy = 1 * COIN;
+    if (nHeight < 3153601) {
+        nSubsidy = 12.4 * COIN;
     }
-
+    else if (nHeight < 4204801) {
+        nSubsidy = 9.51 * COIN;
+    }
+    else if (nHeight < 5256001) {
+        nSubsidy = 8.56 * COIN;
+    }
+    else if (nHeight < 6307201) {
+        nSubsidy = 7.61 * COIN;
+    }
+    else if (nHeight < 7358401) {
+        nSubsidy = 6.66 * COIN;
+    }
+    else if (nHeight < 8409601) {
+        nSubsidy = 5.71 * COIN;
+    }
+    else if (nHeight < 9460801) {
+        nSubsidy = 4.76 * COIN;
+    }
+    else if (nHeight < 10512001) {
+        nSubsidy = 3.81 * COIN;
+    }
+    else if (nHeight < 11563201) {
+        nSubsidy = 2.85 * COIN;
+    }
+    else {
+        nSubsidy = 1.9 * COIN;
+    }
     return nSubsidy + nFees;
 }
 
 CAmount GetMasternodePayment(int nHeight, int64_t blockValue, int nMasternodeCount)
 {
-    int64_t ret = blockValue * 0.4; //40% for masternodes
-
-    return ret;
+    CAmount nSubsidy = 1 * COIN;
+    if (nHeight < 3153601) {
+        nSubsidy = 18.61 * COIN;
+    }
+    else if (nHeight < 4204801) {
+        nSubsidy = 14.27 * COIN;
+    }
+    else if (nHeight < 5256001) {
+        nSubsidy = 12.84 * COIN;
+    }
+    else if (nHeight < 6307201) {
+        nSubsidy = 11.42 * COIN;
+    }
+    else if (nHeight < 7358401) {
+        nSubsidy = 9.99 * COIN;
+    }
+    else if (nHeight < 8409601) {
+        nSubsidy = 8.56 * COIN;
+    }
+    else if (nHeight < 9460801) {
+        nSubsidy = 7.13 * COIN;
+    }
+    else if (nHeight < 10512001) {
+        nSubsidy = 5.71 * COIN;
+    }
+    else if (nHeight < 11563201) {
+        nSubsidy = 4.28 * COIN;
+    }
+    else {
+        nSubsidy = 2.85 * COIN;
+    }
+    return nSubsidy;
 }
 
 bool IsInitialBlockDownload()
@@ -4483,7 +4520,7 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
 {
     RandAddSeedPerfmon();
     if (fDebug) {
-        LogPrintf("received: %s (%u bytes) peer=%d\n", SanitizeString(strCommand), vRecv.size(), pfrom->id);
+        LogPrintf("qqreceived: %s (%u bytes) peer=%d\n", SanitizeString(strCommand), vRecv.size(), pfrom->id);
     }
 
     if (mapArgs.count("-dropmessagestest") && GetRand(atoi(mapArgs["-dropmessagestest"])) == 0) {
@@ -4762,10 +4799,12 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
             pindex = chainActive.Next(pindex);
 
         int nLimit = 500;
-        LogPrintf("getblocks %d to %s limit %d from peer=%d\n", (pindex ? pindex->nHeight : -1), hashStop == uint256(0) ? "end" : hashStop.ToString(), nLimit, pfrom->id);
+        LogPrintf("getblocks %d to %s limit %d from peer=%d; peer address=%s\n ", (pindex ? pindex->nHeight : -1), hashStop == uint256(0) ? "end" : hashStop.ToString(), nLimit, pfrom->id, pfrom->addr.ToString());
         if(!pindex) {
-            LogPrintf("===========PINDEX IS NULL===========\n");
-            LogPrintf("At block %d\n", chainActive.Height());
+            if(fDebug) {
+                LogPrintf("===========PINDEX IS NULL===========\n");
+                LogPrintf("At block %d\n", chainActive.Height());
+            }
         }
         for (; pindex; pindex = chainActive.Next(pindex)) {
             if (pindex->GetBlockHash() == hashStop) {
@@ -5241,6 +5280,12 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
             }
         }
     }
+
+//    else if(strCommand == "ix" || strCommand == "txlvote") {
+//        if(fDebug) LogPrintf("IX started to process. Message: %s\n", strCommand);
+//        bool processed = false;
+//        ProcessInstantX(pfrom, strCommand, vRecv, processed);
+//    }
 
 
     else {

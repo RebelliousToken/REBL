@@ -7,6 +7,8 @@
 
 #include "guiutil.h"
 
+#include "basetabledelegate.h"
+
 #include <QDialog>
 #include <QHeaderView>
 #include <QItemSelection>
@@ -34,8 +36,8 @@ class ReceiveCoinsDialog : public QDialog
 
 public:
     enum ColumnWidths {
-        DATE_COLUMN_WIDTH = 130,
-        LABEL_COLUMN_WIDTH = 120,
+        DATE_COLUMN_WIDTH = 300,
+        LABEL_COLUMN_WIDTH = 300,
         AMOUNT_MINIMUM_COLUMN_WIDTH = 160,
         MINIMUM_COLUMN_WIDTH = 130
     };
@@ -57,6 +59,8 @@ private:
     Ui::ReceiveCoinsDialog* ui;
     GUIUtil::TableViewLastColumnResizingFixer* columnResizingFixer;
     WalletModel* model;
+    BaseTableDelegate* historyTableDelegate;
+    QDialog* confirmDeleteHistoryEntryDialog;
     QMenu* contextMenu;
     void copyColumnToClipboard(int column);
     virtual void resizeEvent(QResizeEvent* event);

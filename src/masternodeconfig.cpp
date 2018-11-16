@@ -81,13 +81,14 @@ bool CMasternodeConfig::read(std::string& strErr)
             iss.clear();
         }
 
-        if (!(iss >> alias >> ip >> privKey >> txHash >> outputIndex))
+        if (!(iss >> alias >> ip >> privKey))
         {
             iss.str(line);
             iss.clear();
-            if (!(iss >> alias >> ip >> privKey >> txHash >> outputIndex))
+            if (!(iss >> alias >> ip >> privKey))
             {
                 LogPrintf("CMasternodeConfig::read - Could not parse masternode.conf. Line: %s\n", line.c_str());
+                strErr = "CMasternodeConfig::read - Could not parse masternode.conf. Line: " + std::to_string(linenumber);
                 streamConfig.close();
                 return false;
             }
@@ -142,6 +143,7 @@ bool CMasternodeConfig::read(std::string& strErr)
         if (!(CService(ip).IsIPv4() && CService(ip).IsRoutable())) 
         {
             LogPrintf("Invalid Address detected in masternode.conf: %s (IPV4 ONLY) \n", line.c_str());
+            strErr = "Invalid Address detected in masternode.conf: " + ip + " in line " + std::to_string(linenumber);
             streamConfig.close();
             return false;
         }
@@ -165,7 +167,7 @@ bool CMasternodeConfig::write()
         {
             alias = adrenaline.getAlias();
             boost::replace_all(alias, " ", "_");
-            streamConfig << alias << " " << adrenaline.getIp() << " " << adrenaline.getPrivKey() << " " << adrenaline.getTxHash() << " " << adrenaline.getOutputIndex() << "\n";
+            streamConfig << alias << " " << adrenaline.getIp() << " " << adrenaline.getPrivKey() << "\n";
         }
     }
 

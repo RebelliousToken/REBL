@@ -64,6 +64,8 @@ src/qt/test/moc*.cpp
 *.o-*
 .rebellious
 *.a
+!libcurl.a
+!libz.a
 *.pb.cc
 *.pb.h
 

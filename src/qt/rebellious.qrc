@@ -40,6 +40,12 @@
         <file alias="tx_input">res/icons/tx_input.png</file>
         <file alias="tx_output">res/icons/tx_output.png</file>
         <file alias="tx_inout">res/icons/tx_inout.png</file>
+        <file alias="unit_rebellious">res/icons/unit_rebellious.png</file>
+        <file alias="unit_mrebellious">res/icons/unit_mrebellious.png</file>
+        <file alias="unit_urebellious">res/icons/unit_urebellious.png</file>
+        <file alias="unit_trebellious">res/icons/unit_trebellious.png</file>
+        <file alias="unit_tmrebellious">res/icons/unit_tmrebellious.png</file>
+        <file alias="unit_turebellious">res/icons/unit_turebellious.png</file>
         <file alias="lock_closed">res/icons/lock_closed.png</file>
         <file alias="lock_open">res/icons/lock_open.png</file>
         <file alias="key">res/icons/key.png</file>
@@ -49,12 +55,16 @@
         <file alias="staking_active">res/icons/staking_active.png</file>
         <file alias="staking_inactive">res/icons/staking_inactive.png</file>
         <file alias="qrcode">res/icons/qrcode.png</file>
-        <file alias="unit_mrebellious">res/icons/unit_mrebellious.png</file>
-        <file alias="unit_rebellious">res/icons/unit_rebellious.png</file>
-        <file alias="unit_tmrebellious">res/icons/unit_tmrebellious.png</file>
-        <file alias="unit_trebellious">res/icons/unit_trebellious.png</file>
-        <file alias="unit_turebellious">res/icons/unit_turebellious.png</file>
-        <file alias="unit_urebellious">res/icons/unit_urebellious.png</file>
+        <file alias="info_icon">res/icons/info_icon.png</file>
+        <file alias="close_icon">res/icons/close_icon.png</file>
+        <file alias="checked">res/icons/checked.png</file>
+        <file alias="unchecked">res/icons/uncheked.png</file>
+        <file alias="balance">res/icons/balance.png</file>
+        <file alias="support">res/icons/support.png</file>
+        <file alias="chat">res/icons/chat.png</file>
+        <file alias="email">res/icons/email.png</file>
+        <file alias="phone">res/icons/phone.png</file>
+        <file alias="social">res/icons/social.png</file>
     </qresource>
     <qresource prefix="/css">
         <file alias="default">res/css/default.css</file>
@@ -73,6 +83,14 @@
         <file alias="splash">res/images/splash.png</file>
         <file alias="splash_testnet">res/images/splash_testnet.png</file>
         <file alias="logo-rebl">res/images/logo-rebl.png</file>
+        <file alias="shadow">res/images/shadow.png</file>
+        <file alias="shadow_element">res/images/shadow_element.png</file>
+        <file>res/images/Table-ElementGreenBig-Shadow.png</file>
+        <file alias="table-element-bg-selected">res/images/Table-ElementGreen-Shadow.png</file>
+        <file alias="table-element-bg">res/images/Table-Element-Shadow.png</file>
+        <file alias="table-element-bg-right">res/images/Table-Element-Shadow-right.png</file>
+        <file alias="table-element-bg-center">res/images/Table-Element-Shadow-center.png</file>
+        <file alias="table-element-bg-left">res/images/Table-Element-Shadow-left.png</file>
     </qresource>
     <qresource prefix="/movies">
         <file alias="spinner-000">res/movies/spinner-000.png</file>

@@ -20,10 +20,15 @@
 #include <QMessageBox>
 #include <QScrollBar>
 #include <QTextDocument>
+#include <QGraphicsDropShadowEffect>
+#include <QVBoxLayout>
+#include <QDialogButtonBox>
 
 ReceiveCoinsDialog::ReceiveCoinsDialog(QWidget* parent) : QDialog(parent),
                                                           ui(new Ui::ReceiveCoinsDialog),
-                                                          model(0)
+                                                          model(0),
+                                                          historyTableDelegate(new BaseTableDelegate(1, 185)),
+                                                          confirmDeleteHistoryEntryDialog(new QDialog(this, Qt::Window | Qt::FramelessWindowHint))
 {
     ui->setupUi(this);
 
@@ -45,6 +50,32 @@ ReceiveCoinsDialog::ReceiveCoinsDialog(QWidget* parent) : QDialog(parent),
     contextMenu->addAction(copyMessageAction);
     contextMenu->addAction(copyAmountAction);
 
+    ui->reqAmount->hide();
+    ui->reqMessage->hide();
+    ui->reuseAddress->hide();
+
+    confirmDeleteHistoryEntryDialog->resize(370, 200);
+
+    QVBoxLayout* la = new QVBoxLayout(confirmDeleteHistoryEntryDialog);
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    QLabel* confirmDelHeader = new QLabel("Remove history", confirmDeleteHistoryEntryDialog);
+    QLabel* confirmDelText = new QLabel("Are you sure you want to delete\nthis item?", confirmDeleteHistoryEntryDialog);
+    QSpacerItem *spacer = new QSpacerItem(40, 30, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    buttonBox->setObjectName("buttonBox");
+    confirmDelHeader->setObjectName("confirmDelHeader");
+    confirmDelText->setObjectName("confirmDelText");
+
+    la->addWidget(confirmDelHeader);
+    la->addWidget(confirmDelText);
+    la->addItem(spacer);
+    la->addWidget(buttonBox);
+    la->setContentsMargins(25, 15, 10, 15);
+    confirmDeleteHistoryEntryDialog->setLayout(la);
+
+    connect(buttonBox, SIGNAL(accepted()), confirmDeleteHistoryEntryDialog, SLOT(accept()));
+    connect(buttonBox, SIGNAL(rejected()), confirmDeleteHistoryEntryDialog, SLOT(reject()));
+
     // context menu signals
     connect(ui->recentRequestsView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showMenu(QPoint)));
     connect(copyLabelAction, SIGNAL(triggered()), this, SLOT(copyLabel()));
@@ -63,12 +94,16 @@ void ReceiveCoinsDialog::setModel(WalletModel* model)
         connect(model->getOptionsModel(), SIGNAL(displayUnitChanged(int)), this, SLOT(updateDisplayUnit()));
         updateDisplayUnit();
 
+        ui->recentRequestsView->setShowGrid(false);
+//        ui->recentRequestsView->setItemDelegate(historyTableDelegate);
+        ui->recentRequestsView->verticalHeader()->setDefaultSectionSize(50);
+        ui->recentRequestsView->setFocusPolicy(Qt::NoFocus);
+
         QTableView* tableView = ui->recentRequestsView;
 
         tableView->verticalHeader()->hide();
         tableView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         tableView->setModel(model->getRecentRequestsTableModel());
-        tableView->setAlternatingRowColors(true);
         tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
         tableView->setSelectionMode(QAbstractItemView::ContiguousSelection);
         tableView->setColumnWidth(RecentRequestsTableModel::Date, DATE_COLUMN_WIDTH);
@@ -78,7 +113,7 @@ void ReceiveCoinsDialog::setModel(WalletModel* model)
             SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
             SLOT(recentRequestsView_selectionChanged(QItemSelection, QItemSelection)));
         // Last 2 columns are set by the columnResizingFixer, when the table geometry is ready.
-        columnResizingFixer = new GUIUtil::TableViewLastColumnResizingFixer(tableView, AMOUNT_MINIMUM_COLUMN_WIDTH, DATE_COLUMN_WIDTH);
+        columnResizingFixer = new GUIUtil::TableViewLastColumnResizingFixer(tableView, LABEL_COLUMN_WIDTH, MINIMUM_COLUMN_WIDTH);
     }
 }
 
@@ -188,7 +223,10 @@ void ReceiveCoinsDialog::on_removeRequestButton_clicked()
         return;
     // correct for selection mode ContiguousSelection
     QModelIndex firstIndex = selection.at(0);
-    model->getRecentRequestsTableModel()->removeRows(firstIndex.row(), selection.length(), firstIndex.parent());
+
+    if(confirmDeleteHistoryEntryDialog->exec() == QDialog::Accepted) {
+        model->getRecentRequestsTableModel()->removeRows(firstIndex.row(), selection.length(), firstIndex.parent());
+    }
 }
 
 // We override the virtual resizeEvent of the QWidget to adjust tables column
@@ -196,7 +234,7 @@ void ReceiveCoinsDialog::on_removeRequestButton_clicked()
 void ReceiveCoinsDialog::resizeEvent(QResizeEvent* event)
 {
     QWidget::resizeEvent(event);
-    columnResizingFixer->stretchColumnWidth(RecentRequestsTableModel::Message);
+    columnResizingFixer->stretchColumnWidth(RecentRequestsTableModel::Label);
 }
 
 void ReceiveCoinsDialog::keyPressEvent(QKeyEvent* event)

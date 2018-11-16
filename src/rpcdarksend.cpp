@@ -194,7 +194,7 @@ Value masternode(const Array& params, bool fHelp)
     		if(mne.getAlias() == alias) {
     			found = true;
     			std::string errorMessage;
-    			bool result = activeMasternode.StopMasterNode(mne.getIp(), mne.getPrivKey(), errorMessage);
+    			bool result = activeMasternode.StopMasterNode(mne.getIp(), mne.getPrivKey(), errorMessage, mne.getVin());
 
 				statusObj.push_back(Pair("result", result ? "successful" : "failed"));
     			if(!result) {
@@ -242,7 +242,7 @@ Value masternode(const Array& params, bool fHelp)
 			total++;
 
 			std::string errorMessage;
-			bool result = activeMasternode.StopMasterNode(mne.getIp(), mne.getPrivKey(), errorMessage);
+            bool result = activeMasternode.StopMasterNode(mne.getIp(), mne.getPrivKey(), errorMessage, mne.getVin());
 
 			Object statusObj;
 			statusObj.push_back(Pair("alias", mne.getAlias()));
@@ -378,19 +378,22 @@ Value masternode(const Array& params, bool fHelp)
 		Object statusObj;
 		statusObj.push_back(Pair("alias", alias));
 
-    	BOOST_FOREACH(CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
-    		if(mne.getAlias() == alias) {
-    			found = true;
-    			std::string errorMessage;
-    			bool result = activeMasternode.Register(mne.getIp(), mne.getPrivKey(), mne.getTxHash(), mne.getOutputIndex(), errorMessage);
+        CRebelliousNodeConfig c;
 
-    			statusObj.push_back(Pair("result", result ? "successful" : "failed"));
-    			if(!result) {
-					statusObj.push_back(Pair("errorMessage", errorMessage));
-				}
-    			break;
-    		}
-    	}
+        BOOST_FOREACH(CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
+            if(mne.getAlias() == alias) {
+                c = pwalletMain->mapMyRebelliousNodes[mne.getIp()];
+                found = true;
+                std::string errorMessage;
+                bool result = activeMasternode.RegisterByPubKey(c.sAddress, c.sMasternodePrivKey, c.sCollateralAddress, errorMessage);
+
+                statusObj.push_back(Pair("result", result ? "successful" : "failed"));
+                if(!result) {
+                    statusObj.push_back(Pair("errorMessage", errorMessage));
+                }
+                break;
+            }
+        }
 
     	if(!found) {
     		statusObj.push_back(Pair("result", "failed"));

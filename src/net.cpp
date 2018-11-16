@@ -353,26 +353,40 @@ CNode* FindNode(const CNetAddr& ip)
     return NULL;
 }
 
-CNode* FindNode(const std::string& addrName)
+CNode* FindNode(const std::string& addrName, bool withoutPort = false)
 {
     LOCK(cs_vNodes);
-    BOOST_FOREACH (CNode* pnode, vNodes)
-        if (pnode->addrName == addrName)
+    if (fDebug) LogPrintf("CNode::FindNode(): needle - %s\n", addrName);
+    int pos = 0;
+    std::string ip = "";
+    BOOST_FOREACH (CNode* pnode, vNodes) {
+        ip = pnode->addrName;
+        if (withoutPort) {
+            pos = pnode->addrName.find(":");
+            if (pos != std::string::npos) {
+                ip.erase(ip.begin() + pos, ip.end());
+            }
+        }
+        if (fDebug) LogPrintf("CNode::FindNode(): pnode - %s\n", ip);
+        if (ip == addrName)
             return (pnode);
+    }
     return NULL;
 }
 
 CNode* FindNode(const CService& addr)
 {
     LOCK(cs_vNodes);
-    BOOST_FOREACH (CNode* pnode, vNodes) {
-        if (Params().NetworkID() == CBaseChainParams::REGTEST) {
-            //if using regtest, just check the IP
-            if ((CNetAddr)pnode->addr == (CNetAddr)addr)
-                return (pnode);
-        } else {
-            if (pnode->addr == addr)
-                return (pnode);
+    if(vNodes.size() > 0) {
+        BOOST_FOREACH (CNode* pnode, vNodes) {
+            if (Params().NetworkID() == CBaseChainParams::REGTEST) {
+                //if using regtest, just check the IP
+                if ((CNetAddr)pnode->addr == (CNetAddr)addr)
+                    return (pnode);
+            } else {
+                if (pnode->addr == addr)
+                    return (pnode);
+            }
         }
     }
     return NULL;
@@ -385,15 +399,15 @@ CNode* ConnectNode(CAddress addrConnect, const char* pszDest, bool darkSendMaste
         // so should be safe to skip this and connect to local Hot MN on CActiveMasternode::ManageStatus()
         if (IsLocal(addrConnect) && !darkSendMaster)
             return NULL;
+    }
 
-        // Look for an existing connection
-        CNode* pnode = FindNode((CService)addrConnect);
-        if (pnode) {
-            pnode->fDarkSendMaster = darkSendMaster;
+    // Look for an existing connection
+    CNode* pnode = FindNode((CService)addrConnect);
+    if (pnode) {
+        pnode->fDarkSendMaster = darkSendMaster;
 
-            pnode->AddRef();
-            return pnode;
-        }
+        pnode->AddRef();
+        return pnode;
     }
 
     /// debug print
