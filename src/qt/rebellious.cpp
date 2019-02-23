@@ -703,10 +703,10 @@ int main(int argc, char* argv[])
         WinShutdownMonitor::registerShutdownBlockReason(QObject::tr("Rebellious didn't yet exit safely..."), (HWND)app.getMainWinId());
 #endif
 
-        int id = QFontDatabase::addApplicationFont(":/fonts/poppins-regular");
+        int id = QFontDatabase::addApplicationFont(":/fonts/saira-regular");
         QString family = QFontDatabase::applicationFontFamilies(id).at(0);
-        QFont poppins(family);
-        app.setFont(poppins);
+        QFont saira(family);
+        app.setFont(saira);
         app.exec();
         app.requestShutdown();
         app.exec();

@@ -46,7 +46,7 @@ public:
         bool valid = false;
         CAmount val = parse(input, &valid);
         if (valid) {
-            input = BitcoinUnits::format(currentUnit, val, false, BitcoinUnits::separatorAlways);
+            input = BitcoinUnits::simpleFormat(currentUnit, val, false, BitcoinUnits::separatorAlways, 3);
             lineEdit()->setText(input);
         }
     }
@@ -58,7 +58,7 @@ public:
 
     void setValue(const CAmount& value)
     {
-        lineEdit()->setText(BitcoinUnits::format(currentUnit, value, false, BitcoinUnits::separatorAlways));
+        lineEdit()->setText(BitcoinUnits::simpleFormat(currentUnit, value, false, BitcoinUnits::separatorAlways, 3));
         emit valueChanged();
     }
 

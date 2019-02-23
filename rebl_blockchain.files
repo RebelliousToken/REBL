@@ -724,8 +724,6 @@ src/qt/coincontroldialog.cpp
 src/qt/coincontroldialog.h
 src/qt/coincontroltreewidget.cpp
 src/qt/coincontroltreewidget.h
-src/qt/createcontract.cpp
-src/qt/createcontract.h
 src/qt/csvmodelwriter.cpp
 src/qt/csvmodelwriter.h
 src/qt/darksendconfig.cpp
@@ -742,7 +740,6 @@ src/qt/forms/rebelliousnodeconfigdialog.ui
 src/qt/forms/rebellioussendconfig.ui
 src/qt/forms/blockexplorer.ui
 src/qt/forms/coincontroldialog.ui
-src/qt/forms/createcontract.ui
 src/qt/forms/darksendconfig.ui
 src/qt/forms/editaddressdialog.ui
 src/qt/forms/editmasternodedialog.ui
@@ -759,8 +756,6 @@ src/qt/forms/rpcconsole.ui
 src/qt/forms/sendcoinsdialog.ui
 src/qt/forms/sendcoinsentry.ui
 src/qt/forms/signverifymessagedialog.ui
-src/qt/forms/smartTokenConfig.ui
-src/qt/forms/tradingdialog.ui
 src/qt/forms/transactiondescdialog.ui
 src/qt/forms/ui_addeditrebelliousnode.h
 src/qt/forms/ui_addressbookpage.h
@@ -769,7 +764,6 @@ src/qt/forms/ui_bip38tooldialog.h
 src/qt/forms/ui_rebelliousnodeconfigdialog.h
 src/qt/forms/ui_blockexplorer.h
 src/qt/forms/ui_coincontroldialog.h
-src/qt/forms/ui_createcontract.h
 src/qt/forms/ui_darksendconfig.h
 src/qt/forms/ui_editaddressdialog.h
 src/qt/forms/ui_editmasternodedialog.h
@@ -786,7 +780,6 @@ src/qt/forms/ui_rpcconsole.h
 src/qt/forms/ui_sendcoinsdialog.h
 src/qt/forms/ui_sendcoinsentry.h
 src/qt/forms/ui_signverifymessagedialog.h
-src/qt/forms/ui_tradingdialog.h
 src/qt/forms/ui_transactiondescdialog.h
 src/qt/guiconstants.h
 src/qt/guiutil.cpp
@@ -845,7 +838,6 @@ src/qt/moc_blockexplorer.cpp
 src/qt/moc_clientmodel.cpp
 src/qt/moc_coincontroldialog.cpp
 src/qt/moc_coincontroltreewidget.cpp
-src/qt/moc_createcontract.cpp
 src/qt/moc_csvmodelwriter.cpp
 src/qt/moc_darksendconfig.cpp
 src/qt/moc_editaddressdialog.cpp
@@ -878,7 +870,6 @@ src/qt/moc_sendcoinsentry.cpp
 src/qt/moc_signverifymessagedialog.cpp
 src/qt/moc_splashscreen.cpp
 src/qt/moc_stakingdialog.cpp
-src/qt/moc_tradingdialog.cpp
 src/qt/moc_trafficgraphwidget.cpp
 src/qt/moc_transactiondesc.cpp
 src/qt/moc_transactiondescdialog.cpp
@@ -1117,8 +1108,6 @@ src/qt/test/paymentservertests.h
 src/qt/test/test_main.cpp
 src/qt/test/uritests.cpp
 src/qt/test/uritests.h
-src/qt/tradingdialog.cpp
-src/qt/tradingdialog.h
 src/qt/trafficgraphwidget.cpp
 src/qt/trafficgraphwidget.h
 src/qt/transactiondesc.cpp

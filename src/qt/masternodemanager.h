@@ -40,7 +40,7 @@ public:
 
 public slots:
     void updateNodeList();
-    void updateRebelliousNode(QString alias, QString addr, QString privkey, QString collateral);
+    void updateRebelliousNode(QString alias, QString addr, QString privkey, QString collateral, QString balance = "", QString index = "");
     void tabChanged();
     
 signals:

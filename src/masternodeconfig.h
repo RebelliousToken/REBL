@@ -24,6 +24,7 @@ public:
 	class CMasternodeEntry {
 
 	private:
+        std::string index;
 		std::string alias;
 		std::string ip;
 		std::string privKey;
@@ -33,13 +34,22 @@ public:
 
 	public:
 
-		CMasternodeEntry(std::string alias, std::string ip, std::string privKey, std::string txHash, std::string outputIndex) {
-			this->alias = alias;
+        CMasternodeEntry(std::string index, std::string alias, std::string ip, std::string privKey, std::string txHash, std::string outputIndex) {
+            this->index = index;
+            this->alias = alias;
 			this->ip = ip;
 			this->privKey = privKey;
 			this->txHash = txHash;
 			this->outputIndex = outputIndex;
 		}
+
+        const std::string& getIndex() const {
+            return index;
+        }
+
+        void setIndex(const std::string& index) {
+            this->index = index;
+        }
 
 		const std::string& getAlias() const {
 			return alias;
@@ -98,8 +108,8 @@ public:
 	void clear();
     bool read(std::string& strErr);
     bool write();
-    void add(std::string alias, std::string ip, std::string privKey, std::string txHash, std::string outputIndex);
-    void remove(std::string ip);
+    void add(string index, std::string alias, std::string ip, std::string privKey, std::string txHash, std::string outputIndex);
+    void remove(std::string index);
 
     CMasternodeEntry findEntryByIp(std::string sAddress) {
         BOOST_FOREACH(CMasternodeEntry mne, entries) {

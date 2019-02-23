@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>1225</width>
     <height>600</height>
    </rect>
   </property>
@@ -42,6 +42,13 @@
         <property name="icon">
          <iconset>
           <normaloff>:/icons/forward</normaloff>:/icons/forward</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="lastBlock">
+        <property name="text">
+         <string>Last Block</string>
         </property>
        </widget>
       </item>
@@ -116,7 +123,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>780</width>
+         <width>1205</width>
          <height>503</height>
         </rect>
        </property>
@@ -154,7 +161,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>1225</width>
      <height>22</height>
     </rect>
    </property>

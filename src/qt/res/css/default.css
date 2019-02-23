@@ -2,10 +2,10 @@
 /*************** [COLOR CODES] DARK Blue:#00A4B3 LIGHT Blue:#00BBCC *****************/
 /****************************************************************************************/
 
-FontLoader { id: Poppins; source: ":/fonts/poppins/Poppins-Regular.ttf" }
+FontLoader { id: Saira; source: ":/fonts/saira/Saira-Regular.ttf" }
 /*FontLoader { id: font; source: ":/fonts/poppins/Poppins-SemiBold.ttf" }*/
 * {
-  font-family: Poppins;
+  font-family: Saira;
 }
 
 
@@ -22,6 +22,11 @@ QStatusBar {
     color: #00A4B3 !important;
     border-top:1px solid #e5e5e5;
     padding-right: 140px;
+}
+
+QStatusBar QLabel {
+    min-height:1em;
+    width: auto;
 }
 
 QStatusBar::item {
@@ -715,6 +720,7 @@ QDialog#SignVerifyMessageDialog QPushButton#clearButton_VM:pressed {
 
 QWidget#AddressBookPage {
     background-color:#F8F6F6;
+    border: 1px solid #818181;
 }
 
 QWidget#AddressBookPage QPushButton#newAddress,
@@ -728,6 +734,15 @@ QWidget#AddressBookPage QPushButton#deleteAddress { /* Delete Address Button */
     color: #00A4B3;
     border: 2px solid #00A4B3;
     background: transparent;
+}
+
+QWidget#AddressBookPage QPushButton#exportButton {
+    padding-left: 25px;
+    padding-right: 25px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    height: 26px;
+    border-radius: 20px;
 }
 
 QWidget#AddressBookPage QPushButton#newAddress:hover,
@@ -1928,7 +1943,7 @@ QCalendarWidget QAbstractItemView:disabled { /* Calendar widget days not in mont
 }
 
 #MasternodeManager QTabWidget::tab-bar {
-    left: 783px;
+    left: 5px;
 }
 
 /* Style the tab using the tab sub-control. Note that
@@ -1960,6 +1975,8 @@ QCalendarWidget QAbstractItemView:disabled { /* Calendar widget days not in mont
 
 #MasternodeManager #mnNetLabel,
 #MasternodeManager #mnMyMasternodesLabel {
+    margin-top: 26px;
+    margin-left: -4px;
     font-size: 25px;
     font-weight: bold;
 }

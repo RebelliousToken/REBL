@@ -8,6 +8,8 @@ Use the autogen script to prepare the build environment.
 
 Always verify the signatures and checksums.
 
+./configure --disable-tests --disable-zmq --with-boost-libdir=/usr/local/lib -- fix boost library
+
 See doc/build-*.md for instructions on building rebelliousd,
 the intended-for-services, no-graphical-interface, reference
 implementation of REBL.
