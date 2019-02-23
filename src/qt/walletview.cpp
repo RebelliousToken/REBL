@@ -3,7 +3,6 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "walletview.h"
-#include "createcontract.h"
 #include "addressbookpage.h"
 #include "askpassphrasedialog.h"
 #include "bip38tooldialog.h"
@@ -21,7 +20,6 @@
 #include "transactiontablemodel.h"
 #include "transactionview.h"
 #include "walletmodel.h"
-#include "tradingdialog.h"
 
 #include "ui_interface.h"
 
@@ -35,6 +33,21 @@
 #include <QSettings>
 #include <QVBoxLayout>
 
+#include <QWidget>
+#include <QObject>
+#include <QTableWidget>
+#include <stdint.h>
+#include "clientmodel.h"
+#include "walletmodel.h"
+
+#include <boost/filesystem.hpp>
+#include <boost/filesystem/fstream.hpp>
+#include "qcustomplot.h"
+
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QNetworkReply>
+
 WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
                                           clientModel(0),
                                           walletModel(0)
@@ -43,9 +56,7 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
     overviewPage = new OverviewPage();
     explorerWindow = new BlockExplorer(this);
     transactionsPage = new QWidget(this);
-    smartToken=new CreateContract(this);
     stakingPage = new StakingDialog(this);
-    tradingPage = new tradingDialog(this);
     QVBoxLayout* vbox = new QVBoxLayout();
     transactionView = new TransactionView(this);
     vbox->addWidget(transactionView);
@@ -61,7 +72,6 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
     transactionSum->setTextInteractionFlags(Qt::TextSelectableByMouse);
 
     transactionsPage->setLayout(vbox);
-    tradingPage->setLayout(vbox);
 
     receiveCoinsPage = new ReceiveCoinsDialog();
     sendCoinsPage = new SendCoinsDialog();
@@ -70,18 +80,17 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
     addWidget(overviewPage);
     addWidget(transactionsPage);
     addWidget(stakingPage);
-    addWidget(tradingPage);
     addWidget(receiveCoinsPage);
     addWidget(sendCoinsPage);
     addWidget(explorerWindow);
-    addWidget(smartToken);   // Testing
 
     QSettings settings;
-    if (settings.value("fShowMasternodesTab").toBool()) {
-        masternodeManagerPage = new MasternodeManager();
-        addWidget(masternodeManagerPage);
+    if(GetBoolArg("-show_masternode", false)) {
+        if (settings.value("fShowMasternodesTab").toBool()) {
+            masternodeManagerPage = new MasternodeManager();
+            addWidget(masternodeManagerPage);
+        }
     }
-
     // Clicking on a transaction on the overview pre-selects the transaction on the transaction history page
     connect(overviewPage, SIGNAL(transactionClicked(QModelIndex)), transactionView, SLOT(focusTransaction(QModelIndex)));
 
@@ -126,8 +135,10 @@ void WalletView::setClientModel(ClientModel* clientModel)
     overviewPage->setClientModel(clientModel);
     sendCoinsPage->setClientModel(clientModel);
     QSettings settings;
-    if (settings.value("fShowMasternodesTab").toBool()) {
-        masternodeManagerPage->setClientModel(clientModel);
+    if(GetBoolArg("-show_masternode", false)) {
+        if (settings.value("fShowMasternodesTab").toBool()) {
+            masternodeManagerPage->setClientModel(clientModel);
+        }
     }
 }
 
@@ -139,8 +150,10 @@ void WalletView::setWalletModel(WalletModel* walletModel)
     transactionView->setModel(walletModel);
     overviewPage->setWalletModel(walletModel);
     QSettings settings;
-    if (settings.value("fShowMasternodesTab").toBool()) {
-        masternodeManagerPage->setWalletModel(walletModel);
+    if(GetBoolArg("-show_masternode", false)) {
+        if (settings.value("fShowMasternodesTab").toBool()) {
+            masternodeManagerPage->setWalletModel(walletModel);
+        }
     }
     receiveCoinsPage->setModel(walletModel);
     sendCoinsPage->setModel(walletModel);
@@ -168,12 +181,12 @@ void WalletView::setWalletModel(WalletModel* walletModel)
 void WalletView::processNewTransaction(const QModelIndex& parent, int start, int /*end*/)
 {
     // Prevent balloon-spam when initial block download is in progress
-    if (!walletModel || !clientModel || clientModel->inInitialBlockDownload())
+    if (/*!walletModel || !clientModel ||*/ clientModel->inInitialBlockDownload())
         return;
 
     TransactionTableModel* ttm = walletModel->getTransactionTableModel();
-    if (!ttm || ttm->processingQueuedTransactions())
-        return;
+    //if (!ttm || ttm->processingQueuedTransactions())
+      //  return;
 
     QString date = ttm->index(start, TransactionTableModel::Date, parent).data().toString();
     qint64 amount = ttm->index(start, TransactionTableModel::Amount, parent).data(Qt::EditRole).toULongLong();
@@ -198,11 +211,6 @@ void WalletView::gotoStakingPage()
     setCurrentWidget(stakingPage);
 }
 
-void WalletView::gotoTradingPage()
-{
-    setCurrentWidget(tradingPage);
-}
-
 void WalletView::gotoBlockExplorerPage()
 {
     setCurrentWidget(explorerWindow);
@@ -211,14 +219,13 @@ void WalletView::gotoBlockExplorerPage()
 void WalletView::gotoMasternodePage()
 {
     QSettings settings;
-    if (settings.value("fShowMasternodesTab").toBool()) {
-        setCurrentWidget(masternodeManagerPage);
+    if(GetBoolArg("-show_masternode", false)) {
+        if (settings.value("fShowMasternodesTab").toBool()) {
+            setCurrentWidget(masternodeManagerPage);
+        }
     }
 }
-void WalletView::gotoSmartTokenPage()
-{
-    setCurrentWidget(smartToken);       //Testing
-}
+
 void WalletView::gotoReceiveCoinsPage()
 {
     setCurrentWidget(receiveCoinsPage);

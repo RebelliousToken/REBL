@@ -141,6 +141,11 @@ bool CActiveMasternode::StopMasterNode(std::string& errorMessage) {
 
 // Send stop dseep to network for any masternode
 bool CActiveMasternode::StopMasterNode(CTxIn vin, CService service, CKey keyMasternode, CPubKey pubKeyMasternode, std::string& errorMessage) {
+    if(status == MASTERNODE_STOPPED || status == MASTERNODE_NOT_PROCESSED) {
+        errorMessage = "masternode is not in a running status";
+        LogPrintf("CActiveMasternode::Dseep() - Error: %s\n", errorMessage.c_str());
+        return false;
+    }
     pwalletMain->UnlockCoin(vin.prevout);
 	return Dseep(vin, service, keyMasternode, pubKeyMasternode, errorMessage, true);
 }
@@ -248,6 +253,12 @@ bool CActiveMasternode::RegisterByPubKey(std::string strService, std::string str
     	LogPrintf("Register::Register() - Error: %s\n", errorMessage.c_str());
 		return false;
 	}
+    if(GetInputAge(vin) < MASTERNODE_MIN_CONFIRMATIONS) {
+        LogPrintf("CActiveMasternode::ManageStatus() - Masternode payment transaction must have at least %d confirmations - %d confirmations\n", MASTERNODE_MIN_CONFIRMATIONS, GetInputAge(vin));
+        status = MASTERNODE_INPUT_TOO_NEW;
+        errorMessage = "Please try later. Masternode payment transaction must have at least " + std::to_string(MASTERNODE_MIN_CONFIRMATIONS) + " confirmations\n";
+        return false;
+    }
 	return Register(vin, CService(strService), keyCollateralAddress, pubKeyCollateralAddress, keyMasternode, pubKeyMasternode, errorMessage);
 }
 
@@ -444,7 +455,7 @@ vector<COutput> CActiveMasternode::SelectCoinsMasternode() {
 
     // Filter
     BOOST_FOREACH(const COutput& out, vCoins) {
-        if(out.tx->vout[out.i].nValue == GetMNCollateral(chainActive.Tip()->nHeight)*COIN) {
+        if(out.tx->vout[out.i].nValue == GetMNCollateral(chainActive.Height())*COIN) {
         	filteredCoins.push_back(out);
         }
     }

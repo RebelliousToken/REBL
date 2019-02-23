@@ -648,18 +648,6 @@ else
     use_boost=yes
 fi
 
-if test x$bitcoin_enable_qt = xyes; then
-dnl enable tradingdialog
-  AC_MSG_CHECKING([if the trading dialog should be enabled])
-    if test x$bitcoin_qt_got_major_vers = x5; then
-      AC_MSG_RESULT(yes)
-      AC_DEFINE_UNQUOTED([HAVE_QT5],[1],[Define to 1 to enable trading dialog])
-
-    else
-      AC_MSG_RESULT(no)
-    fi
-fi
-
 if test x$use_boost = xyes; then
 
 dnl Check for boost libs

@@ -36,8 +36,9 @@ class ReceiveCoinsDialog : public QDialog
 
 public:
     enum ColumnWidths {
-        DATE_COLUMN_WIDTH = 300,
-        LABEL_COLUMN_WIDTH = 300,
+        DATE_COLUMN_WIDTH = 160,
+        LABEL_COLUMN_WIDTH = 180,
+        ADDRESS_COLUMN_WIDTH = 330,
         AMOUNT_MINIMUM_COLUMN_WIDTH = 160,
         MINIMUM_COLUMN_WIDTH = 130
     };
@@ -74,6 +75,7 @@ private slots:
     void updateDisplayUnit();
     void showMenu(const QPoint& point);
     void copyLabel();
+    void copyAddress();
     void copyMessage();
     void copyAmount();
 };

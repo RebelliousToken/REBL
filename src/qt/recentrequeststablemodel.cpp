@@ -24,7 +24,7 @@ RecentRequestsTableModel::RecentRequestsTableModel(CWallet* wallet, WalletModel*
         addNewRequest(request);
 
     /* These columns must match the indices in the ColumnIndex enumeration */
-    columns << tr("Date") << tr("Label");
+    columns << tr("Date") << tr("Label") << tr("Address");
 
     connect(walletModel->getOptionsModel(), SIGNAL(displayUnitChanged(int)), this, SLOT(updateDisplayUnit()));
 }
@@ -65,6 +65,8 @@ QVariant RecentRequestsTableModel::data(const QModelIndex& index, int role) cons
             } else {
                 return rec->recipient.label;
             }
+        case Address:
+            return rec->recipient.address.toUtf8().constData();
         }
     }
     return QVariant();
@@ -81,6 +83,9 @@ QVariant RecentRequestsTableModel::headerData(int section, Qt::Orientation orien
         if (role == Qt::DisplayRole && section < columns.size()) {
             return columns[section];
         }
+    }
+    if (role == Qt::TextAlignmentRole) {
+        return QVariant(Qt::AlignLeft | Qt::AlignVCenter);
     }
     return QVariant();
 }

@@ -163,11 +163,13 @@ public:
 
         assert(hashGenesisBlock == uint256("0x189a48366f8d4c555cb3d051461a32890023a6a8c0ad36f8c87573883f0eac16"));
         assert(genesis.hashMerkleRoot == uint256("0x35acca379dc5f7a262607b5d7e41c65f4d8c5685fe4e1d03a9e176d4e17e4dc0"));
-
+        vSeeds.clear();
         vSeeds.push_back(CDNSSeedData("1", "")); // DNSSeed
+        vSeeds.push_back(CDNSSeedData("2", "")); // DNSSeed
+        vSeeds.push_back(CDNSSeedData("3", "")); // DNSSeed
 
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,48); // REBL Start letter L
-        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,48);
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,60);
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,122);
         base58Prefixes[SECRET_KEY]     = std::vector<unsigned char>(1,155);
         base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x07)(0x28)(0xA2)(0x4E).convert_to_container<std::vector<unsigned char> >();
         base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x03)(0xD8)(0xA1)(0xE5).convert_to_container<std::vector<unsigned char> >();
@@ -239,7 +241,7 @@ public:
 
         vFixedSeeds.clear();
         vSeeds.clear();
-        vSeeds.push_back(CDNSSeedData("rebellioustest1", ""));
+        //vSeeds.push_back(CDNSSeedData("rebellioustest1", ""));
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 139); // Testnet rebellious addresses start with 'x' or 'y'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 19);  // Testnet rebellious script addresses start with '8' or '9'

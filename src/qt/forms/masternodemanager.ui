@@ -59,6 +59,13 @@
             <number>0</number>
            </property>
            <item>
+            <widget class="QLabel" name="mnMyMasternodesLabel">
+             <property name="text">
+              <string>My Masternode</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <layout class="QHBoxLayout" name="horizontalLayout">
              <item>
               <widget class="QPushButton" name="createButton">
@@ -152,6 +159,11 @@ background-color: #00A4B3;
                <string>Collateral Address</string>
               </property>
              </column>
+             <column>
+              <property name="text">
+               <string>Balance (REBL)</string>
+              </property>
+             </column>
             </widget>
            </item>
            <item>
@@ -232,8 +244,13 @@ QComboBox::item {
 }</string>
                </property>
                <property name="currentIndex">
-                <number>3</number>
+                <number>0</number>
                </property>
+               <item>
+                <property name="text">
+                 <string>Actions</string>
+                </property>
+               </item>
                <item>
                 <property name="text">
                  <string>Edit</string>
@@ -241,17 +258,7 @@ QComboBox::item {
                </item>
                <item>
                 <property name="text">
-                 <string>Get config</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
                  <string>Remove</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Actions</string>
                 </property>
                </item>
               </widget>
@@ -267,41 +274,7 @@ QComboBox::item {
          <string>NETWORK</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout">
-         <item row="0" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_3">
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
-           <item>
-            <widget class="QLabel" name="label_2">
-             <property name="text">
-              <string>Masternodes Active:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="countLabel">
-             <property name="text">
-              <string>0</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
-         <item row="1" column="0">
+         <item row="2" column="0">
           <widget class="QTableWidget" name="tableWidget">
            <property name="editTriggers">
             <set>QAbstractItemView::NoEditTriggers</set>
@@ -347,6 +320,47 @@ QComboBox::item {
              <string>Pubkey</string>
             </property>
            </column>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>Masternodes Active:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="countLabel">
+             <property name="text">
+              <string>0</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="mnNetLabel">
+           <property name="text">
+            <string>Masternode Network</string>
+           </property>
           </widget>
          </item>
         </layout>

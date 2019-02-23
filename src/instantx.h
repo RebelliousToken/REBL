@@ -18,8 +18,8 @@
 using namespace std;
 using namespace boost;
 
-#define INSTANTX_SIGNATURES_REQUIRED           20
-#define INSTANTX_SIGNATURES_TOTAL              30
+#define INSTANTX_SIGNATURES_REQUIRED           2
+#define INSTANTX_SIGNATURES_TOTAL              20
 
 class CConsensusVote;
 class CTransaction;

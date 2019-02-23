@@ -94,11 +94,9 @@ private:
     QLabel* labelBalance;
 
     QMenuBar* appMenuBar;
-    QAction* smartToken;
     QAction* overviewAction;
     QAction* historyAction;
     QAction* stakingAction;
-    QAction* tradingAction;
     QAction* masternodeAction;
     QAction* quitAction;
     QAction* sendCoinsAction;
@@ -209,14 +207,10 @@ private slots:
     void gotoHistoryPage();
     /** Switch to staking page */
     void gotoStakingPage();
-    /** Switch to trading page */
-    void gotoTradingPage();
     /** Switch to Explorer Page */
     void gotoBlockExplorerPage();
     /** Switch to masternode page */
     void gotoMasternodePage();
-    /** Switch to gotoSmartTokenPage*/
-    void gotoSmartTokenPage();
     /** Switch to receive coins page */
     void gotoReceiveCoinsPage();
     /** Switch to send coins page */

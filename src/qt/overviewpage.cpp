@@ -204,12 +204,6 @@ OverviewPage::OverviewPage(QWidget* parent) : QWidget(parent),
     ui->supportHLayout->addWidget(supportTextLabel);
 
     totalBalanceTextLabel->setStyleSheet("color:#BABABA;font-size:14px;");
-    ui->chargeButton->setStyleSheet(QString::fromUtf8("border: 2px solid #00A4B3;"
-                                                   "border-radius: 20px;"
-                                                   "height: 26px;"
-                                                   "padding: 5px;"
-                                                   "font-weight: bold;"
-                                                   "color: #00A4B3;"));
 
     ui->labelTotal->setStyleSheet("font-size:18px;font-weight:400;color:#00A4B3!important;");
 
@@ -517,7 +511,7 @@ void OverviewPage::darksendStatus()
 #if 0
     static int64_t nLastDSProgressBlockTime = 0;
 
-    int nBestHeight = chainActive.Tip()->nHeight;
+    int nBestHeight = chainActive.Height();
 
     // we we're processing more then 1 block per second, we'll just leave
     //if (((nBestHeight - darksendPool.cachedNumBlocks) / (GetTimeMillis() - nLastDSProgressBlockTime + 1) > 1)) return;

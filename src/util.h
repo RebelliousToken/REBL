@@ -30,7 +30,6 @@
 #include <boost/thread/exceptions.hpp>
 
 //REBL only features
-
 extern bool fMasterNode;
 extern bool fEnableInstanTX;
 extern int nInstanTXDepth;
@@ -44,6 +43,7 @@ extern int keysLoaded;
 extern bool fSucessfullyLoaded;
 extern std::vector<int64_t> darkSendDenominations;
 extern std::string strBudgetMode;
+extern std::atomic<bool> hideLogMessage;
 
 extern std::map<std::string, std::string> mapArgs;
 extern std::map<std::string, std::vector<std::string> > mapMultiArgs;

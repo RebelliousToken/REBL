@@ -31,7 +31,7 @@ static int column_alignments[] = {
     Qt::AlignLeft | Qt::AlignVCenter, /* date */
     Qt::AlignLeft | Qt::AlignVCenter, /* type */
     Qt::AlignLeft | Qt::AlignVCenter, /* address */
-    Qt::AlignRight | Qt::AlignVCenter /* amount */
+    Qt::AlignLeft | Qt::AlignVCenter /* amount */
 };
 
 // Comparison operator for sort/binary search of model tx list
@@ -246,6 +246,7 @@ void TransactionTableModel::updateConfirmations()
     //  for all rows. Qt is smart enough to only actually request the data for the
     //  visible rows.
     emit dataChanged(index(0, Status), index(priv->size() - 1, Status));
+    emit dataChanged(index(0, Date), index(priv->size() - 1, Date));
     emit dataChanged(index(0, ToAddress), index(priv->size() - 1, ToAddress));
 }
 
@@ -396,7 +397,7 @@ QString TransactionTableModel::formatTxToAddress(const TransactionRecord* wtx, b
     case TransactionRecord::SendToAddress:
     case TransactionRecord::Generated:
     case TransactionRecord::StakeMint:
-        return lookupAddress(wtx->address, tooltip);
+        return lookupAddress(wtx->address, tooltip) + watchAddress;
     case TransactionRecord::Darksend:
         return lookupAddress(wtx->address, tooltip) + watchAddress;
     case TransactionRecord::SendToOther:
@@ -489,7 +490,7 @@ QVariant TransactionTableModel::txWatchonlyDecoration(const TransactionRecord* w
 
 QString TransactionTableModel::formatTooltip(const TransactionRecord* rec) const
 {
-    QString tooltip = formatTxStatus(rec) + formatTxType(rec);
+    QString tooltip = formatTxStatus(rec) + " " + formatTxType(rec);
     if (rec->type == TransactionRecord::RecvFromOther || rec->type == TransactionRecord::SendToOther ||
         rec->type == TransactionRecord::SendToAddress || rec->type == TransactionRecord::RecvWithAddress || rec->type == TransactionRecord::MNReward) {
         tooltip += QString(" ") + formatTxToAddress(rec, true);

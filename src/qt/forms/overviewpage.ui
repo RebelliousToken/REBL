@@ -95,10 +95,21 @@ font-weight:400;
         <item row="4" column="0">
          <widget class="QPushButton" name="chargeButton">
           <property name="styleSheet">
-           <string notr="true"/>
+           <string notr="true">* {
+    border: 2px solid #00A4B3;
+    border-radius: 20px;
+    height: 26px;
+    padding: 5px;
+    font-weight: bold;
+    color: #00A4B3;
+}
+:hover {
+    background: #00A4B3;
+    color:#ffffff;
+}</string>
           </property>
           <property name="text">
-           <string>Charge</string>
+           <string>Add Funds</string>
           </property>
          </widget>
         </item>

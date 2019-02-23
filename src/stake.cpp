@@ -30,7 +30,7 @@
 #endif
 
 using namespace std;
-
+uint256 myStakeHash = 0;
 // MODIFIER_INTERVAL: time to elapse before new modifier is computed
 static const unsigned int MODIFIER_INTERVAL = 10 * 60;
 static const unsigned int MODIFIER_INTERVAL_TESTNET = 60;
@@ -612,6 +612,7 @@ bool Stake::IsActive() const
 {
     bool nStaking = false;
     auto tip = chainActive.Tip();
+    if (!tip) return false;
     if (mapHashedBlocks.count(tip->nHeight))
         nStaking = true;
     else if (mapHashedBlocks.count(tip->nHeight - 1) && HasStaked())
@@ -826,7 +827,7 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
     }
 
     int64_t blockValue = nCredit;
-    int64_t masternodePayment = GetMasternodePayment(chainActive.Tip()->nHeight+1, nReward);
+    int64_t masternodePayment = GetMasternodePayment(chainActive.Height() + 1, nReward);
 
     // Set output amount
     if (hasMasternodePayment) {
@@ -904,16 +905,24 @@ bool Stake::GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int 
     if (!blocktemplate) {
         return false; // No stake available.
     }
-    
+
     CBlock * const block = &blocktemplate->block;
     if (!block->IsProofOfStake()) {
         return error("%s: Created non-staked block:\n%s", __func__, block->ToString());
     }
-    
+
     IncrementExtraNonce(block, tip, extra);
 
     if (!block->SignBlock(*wallet)) {
         return error("%s: Cant sign new block.", __func__);
+    }
+
+    // don't allow to stake two times in a row
+    if (Stake::myStakeHash == block->hashPrevBlock) {
+        if (fDebug) {
+            LogPrintf("%s: Stake::mystake=%s block->hashPrevBlock=%s \n", __func__, Stake::myStakeHash.GetHex(), block->hashPrevBlock.ToString());
+        }
+        return false;
     }
 
     SetThreadPriority(THREAD_PRIORITY_NORMAL);
@@ -926,13 +935,15 @@ bool Stake::GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int 
 #if defined(DEBUG_DUMP_STAKE_CHECK)&&defined(DEBUG_DUMP_STAKING_INFO)
     DEBUG_DUMP_STAKE_CHECK();
 #endif
+
     if (good) {
 #if defined(DEBUG_DUMP_STAKE_FOUND)&&defined(DEBUG_DUMP_STAKING_INFO)
         DEBUG_DUMP_STAKE_FOUND();
 #endif
-        LogPrintf("%s: found stake %s, block %s\n%s\n", __func__, 
+        LogPrintf("%s: found stake %s, block %s\n%s\n", __func__,
                   proof1.GetHex(), hash.GetHex(), block->ToString());
         ProcessBlockFound(block, *wallet, const_cast<CReserveKey &>(key));
+        Stake::myStakeHash = hash;
     } else if (!GetProof(hash, proof2)) {
         SetProof(hash, proof1);
     } else if (proof1 != proof2) {
@@ -949,7 +960,9 @@ void Stake::StakingThread(CWallet *wallet)
     LogPrintf("%s: started!\n", __func__);
     
     SetThreadPriority(THREAD_PRIORITY_LOWEST);
-
+    if(chainActive.Tip()->nHeight < Checkpoints::GetTotalBlocksEstimate()){
+        return ;
+    }
     try {
         boost::this_thread::interruption_point();
         int nHeight = 0; (void)nHeight;
@@ -970,7 +983,7 @@ void Stake::StakingThread(CWallet *wallet)
                 while (wallet->IsLocked() || nReserveBalance >= wallet->GetBalance()) {
                     if (!nStakingInterrupped && !ShutdownRequested()) {
                         nStakeInterval = 0;
-                        MilliSleep(3000);
+                        MilliSleep(1500);
                         continue;
                     } else {
                         nCanStake = false; break;
@@ -994,9 +1007,9 @@ void Stake::StakingThread(CWallet *wallet)
             DEBUG_DUMP_STAKING_THREAD();
 #endif
             if (nCanStake && GenBlockStake(wallet, reserve, extra)) {
-                MilliSleep(1500);
+                MilliSleep(3000); //TODO REMOVE
             } else {
-                MilliSleep(1000);
+                MilliSleep(1500);
             }
         }
         boost::this_thread::interruption_point();

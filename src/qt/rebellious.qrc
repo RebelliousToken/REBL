@@ -149,5 +149,14 @@
         <file>res/fonts/poppins/Poppins-Bold.ttf</file>
         <file>res/fonts/poppins/Poppins-BlackItalic.ttf</file>
         <file>res/fonts/poppins/Poppins-Black.ttf</file>
+        <file>res/fonts/saira/Saira-Black.ttf</file>
+        <file>res/fonts/saira/Saira-ExtraBold.ttf</file>
+        <file>res/fonts/saira/Saira-Bold.ttf</file>
+        <file>res/fonts/saira/Saira-SemiBold.ttf</file>
+        <file>res/fonts/saira/Saira-Medium.ttf</file>
+        <file alias="saira-regular">res/fonts/saira/Saira-Regular.ttf</file>
+        <file>res/fonts/saira/Saira-Light.ttf</file>
+        <file>res/fonts/saira/Saira-ExtraLight.ttf</file>
+        <file>res/fonts/saira/Saira-Thin.ttf</file>
     </qresource>
 </RCC>
