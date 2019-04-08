@@ -42,9 +42,9 @@ void AddEditRebelliousNode::on_okButton_clicked()
             return;
         }
         CRebelliousNodeConfig c;
-        int index = masternodeConfig.getCount()+2;
-        c.sAlias = "false"; // for compatibility
-        c.sIndex = "Masternode_"+std::to_string(index);
+        int index = masternodeConfig.getCount();
+        c.sAlias = "Masternode"; // for compatibility
+        c.sIndex = std::to_string(index+2);
         c.sAddress = ipPort.ToStringIPPort();
         CKey secret;
         secret.MakeNewKey(false);

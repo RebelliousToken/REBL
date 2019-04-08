@@ -16,6 +16,10 @@ CMasternodeConfig masternodeConfig;
 
 void CMasternodeConfig::add(std::string index, std::string alias, std::string ip, std::string privKey, std::string txHash, std::string outputIndex)
 {
+    LogPrintf("%s MASTERNODE \n",index);
+    if(index=="-1"){
+        index == "0";
+    }
     CMasternodeEntry cme(index, alias, ip, privKey, txHash, outputIndex);
     entries.push_back(cme);
 }

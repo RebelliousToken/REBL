@@ -121,9 +121,9 @@ bool CActiveMasternode::StopMasterNode(std::string strService, std::string strKe
 // Send stop dseep to network for main masternode
 bool CActiveMasternode::StopMasterNode(std::string& errorMessage) {
 	if(status != MASTERNODE_IS_CAPABLE && status != MASTERNODE_REMOTELY_ENABLED) {
-		errorMessage = "masternode is not in a running status";
-    	LogPrintf("CActiveMasternode::StopMasterNode() - Error: %s\n", errorMessage.c_str());
-		return false;
+		//errorMessage = "masternode is not in a running status";
+    	//LogPrintf("CActiveMasternode::StopMasterNode() - Error: %s\n", errorMessage.c_str());
+		//return false;
 	}
 
 	status = MASTERNODE_STOPPED;
@@ -142,9 +142,9 @@ bool CActiveMasternode::StopMasterNode(std::string& errorMessage) {
 // Send stop dseep to network for any masternode
 bool CActiveMasternode::StopMasterNode(CTxIn vin, CService service, CKey keyMasternode, CPubKey pubKeyMasternode, std::string& errorMessage) {
     if(status == MASTERNODE_STOPPED || status == MASTERNODE_NOT_PROCESSED) {
-        errorMessage = "masternode is not in a running status";
-        LogPrintf("CActiveMasternode::Dseep() - Error: %s\n", errorMessage.c_str());
-        return false;
+    //    errorMessage = "masternode is not in a running status";
+    //    LogPrintf("CActiveMasternode::Dseep() - Error: %s\n", errorMessage.c_str());
+     //   return false;
     }
     pwalletMain->UnlockCoin(vin.prevout);
 	return Dseep(vin, service, keyMasternode, pubKeyMasternode, errorMessage, true);
@@ -152,9 +152,9 @@ bool CActiveMasternode::StopMasterNode(CTxIn vin, CService service, CKey keyMast
 
 bool CActiveMasternode::Dseep(std::string& errorMessage) {
 	if(status != MASTERNODE_IS_CAPABLE && status != MASTERNODE_REMOTELY_ENABLED) {
-		errorMessage = "masternode is not in a running status";
-    	LogPrintf("CActiveMasternode::Dseep() - Error: %s\n", errorMessage.c_str());
-		return false;
+	//	errorMessage = "masternode is not in a running status";
+    	//LogPrintf("CActiveMasternode::Dseep() - Error: %s\n", errorMessage.c_str());
+	//	return false;
 	}
 
     CPubKey pubKeyMasternode;
@@ -249,11 +249,11 @@ bool CActiveMasternode::RegisterByPubKey(std::string strService, std::string str
     }
 
     if(!GetMasterNodeVinForPubKey(collateralAddress, vin, pubKeyCollateralAddress, keyCollateralAddress)) {
-		errorMessage = "could not allocate vin for collateralAddress";
+		errorMessage = "could not allocate vin for collateralAddress" + GetInputAge(vin) + vin.ToString();
     	LogPrintf("Register::Register() - Error: %s\n", errorMessage.c_str());
 		return false;
 	}
-    if(GetInputAge(vin) < MASTERNODE_MIN_CONFIRMATIONS) {
+    if(GetInputAge(vin) < 1){//MASTERNODE_MIN_CONFIRMATIONS) { //TODO REMOVE
         LogPrintf("CActiveMasternode::ManageStatus() - Masternode payment transaction must have at least %d confirmations - %d confirmations\n", MASTERNODE_MIN_CONFIRMATIONS, GetInputAge(vin));
         status = MASTERNODE_INPUT_TOO_NEW;
         errorMessage = "Please try later. Masternode payment transaction must have at least " + std::to_string(MASTERNODE_MIN_CONFIRMATIONS) + " confirmations\n";
