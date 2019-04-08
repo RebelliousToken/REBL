@@ -99,7 +99,7 @@ void generateGenesis(CBlock genesis) {
     printf("New hash: %s\n", hash.ToString().c_str());
     printf("Merkle: %s\n", genesis.hashMerkleRoot.ToString().c_str());
     printf("Nonce: %d\n", genesis.nNonce);
-//            genesis.print();
+           //genesis.print();
 
 }
 
@@ -140,7 +140,7 @@ public:
         const char* pszTimestamp = "3oct2018 - BBC: Sanctions on Iran: International Court of Justice rules against US"; // Input Activation code to activate blockchain
         CMutableTransaction txNew;
         txNew.nVersion = 1;
-        txNew.nTime = 1538581316;
+        txNew.nTime = 1554284737;
         txNew.nLockTime = 0;
         txNew.vin.resize(1);
         txNew.vout.resize(1);
@@ -153,7 +153,7 @@ public:
         genesis.nVersion = 1;
         genesis.nTime = txNew.nTime;
         genesis.nBits = bnProofOfWorkLimit.GetCompact();
-        genesis.nNonce = 0;
+        genesis.nNonce = 1;
 
         hashGenesisBlock = genesis.GetHash();
 
@@ -161,15 +161,14 @@ public:
             generateGenesis(genesis);
         }
 
-        assert(hashGenesisBlock == uint256("0x189a48366f8d4c555cb3d051461a32890023a6a8c0ad36f8c87573883f0eac16"));
-        assert(genesis.hashMerkleRoot == uint256("0x35acca379dc5f7a262607b5d7e41c65f4d8c5685fe4e1d03a9e176d4e17e4dc0"));
+        assert(hashGenesisBlock == uint256("19f2e51794aa11f076db07f3f171836242ec7eca5217dfccea6b6e3e14db4b40"));
+        assert(genesis.hashMerkleRoot == uint256("3c8a16464c668798013ce24d96a0f5ac5c03349a67fd18eb41e0ddf03825fc60"));
         vSeeds.clear();
-        vSeeds.push_back(CDNSSeedData("1", "")); // DNSSeed
-        vSeeds.push_back(CDNSSeedData("2", "")); // DNSSeed
-        vSeeds.push_back(CDNSSeedData("3", "")); // DNSSeed
+        vSeeds.push_back(CDNSSeedData("1", "dnsseed.rebellious.io")); // DNSSeed
+     
 
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,60);
-        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,122);
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,60); // REBL - 60
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,122); // REBL - 122
         base58Prefixes[SECRET_KEY]     = std::vector<unsigned char>(1,155);
         base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x07)(0x28)(0xA2)(0x4E).convert_to_container<std::vector<unsigned char> >();
         base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x03)(0xD8)(0xA1)(0xE5).convert_to_container<std::vector<unsigned char> >();
@@ -219,7 +218,7 @@ public:
         pchMessageStart[2] = 0x56;
         pchMessageStart[3] = 0xab;
         vAlertPubKey = ParseHex("");
-        nDefaultPort = 28333;
+        nDefaultPort = 12999;
         bnProofOfWorkLimit = ~uint256(0) >> 1;
         nEnforceBlockUpgradeMajority = 51;
         nRejectBlockOutdatedMajority = 75;
@@ -227,14 +226,14 @@ public:
         nMinerThreads = 0;
         nTargetTimespan = 30 * 60; // REBL: 1 day
         nTargetSpacing = 3 * 60;  // REBL: 1 minute
-        nLastPOWBlock = 6000000;
+        nLastPOWBlock = 80;
         nMaturity = 79;
         nModifierUpdateBlock = 51197; //approx Mon, 17 Apr 2017 04:00:00 GMT
 
         //! Modify the testnet genesis block so the timestamp is valid for a later start.
         genesis.nBits  = 0x1e0fffff;
-        genesis.nTime = 1504344001;
-        genesis.nNonce = 1454059;
+        genesis.nTime = 1554284738;
+        genesis.nNonce = 1;
 
         hashGenesisBlock = genesis.GetHash();
 //        assert(hashGenesisBlock == uint256("0"));
@@ -302,12 +301,12 @@ public:
         nTargetTimespan = 24 * 60 * 60; // Rebellious: 1 day
         nTargetSpacing = 1 * 60;        // Rebellious: 1 minutes
         bnProofOfWorkLimit = ~uint256(0) >> 1;
-        genesis.nTime = 1454124731;
+        genesis.nTime = 1554284739;
         genesis.nBits = 0x207fffff;
-        genesis.nNonce = 12345;
+        genesis.nNonce = 1;
 
         hashGenesisBlock = genesis.GetHash();
-        nDefaultPort = 51476;
+        nDefaultPort = 12998;
 //        assert(hashGenesisBlock == uint256("0"));
 
         vFixedSeeds.clear(); //! Testnet mode doesn't have any fixed seeds.
@@ -338,7 +337,7 @@ public:
     {
         networkID = CBaseChainParams::UNITTEST;
         strNetworkID = "unittest";
-        nDefaultPort = 51478;
+        nDefaultPort = 12997;
         vFixedSeeds.clear(); //! Unit test mode doesn't have any fixed seeds.
         vSeeds.clear();      //! Unit test mode doesn't have any DNS seeds.
 

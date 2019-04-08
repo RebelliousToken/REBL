@@ -181,54 +181,86 @@ bool setMasterNodeForIX(CRebelliousNodeConfig c, std::string& errorMessage) {
 void MasternodeManager::updateRebelliousNode(QString alias, QString addr, QString privkey, QString collateral, QString balance, QString index)
 {
     LOCK(cs_adrenaline);
-    bool bFound = false;
-    int nodeRow = 0;
-
-    QList<QTableWidgetItem *> items = ui->tableWidget_2->findItems(collateral, Qt::MatchExactly);
-
-    if(items.count() > 0){
-        bFound = true;
-        nodeRow = items.at(0)->row();
-    }
-
-    std::string indexToDisplay = index.toStdString();
-
-    if(nodeRow == 0 && !bFound) {
-            ui->tableWidget_2->insertRow(0);
-            indexToDisplay = "Masternode_"+std::to_string(ui->tableWidget_2->rowCount());
-    }
-
-    boost::replace_all(indexToDisplay, "_", " ");
-
-    QTableWidgetItem *statusItem = new QTableWidgetItem("Inactive");
-
-    BOOST_FOREACH(CMasterNode mn, vecMasternodes)
-    {
-        if(QString::fromStdString(mn.addr.ToString()) == addr && mn.IsEnabled()) {
-            statusItem->setText("Active");
-        }
-    }
-
-    QTableWidgetItem *aliasItem = new QTableWidgetItem(QString::fromStdString(indexToDisplay));
+    QTableWidgetItem *aliasItem = new QTableWidgetItem(index);
     QTableWidgetItem *addrItem = new QTableWidgetItem(addr);
     QTableWidgetItem *collateralItem = new QTableWidgetItem(collateral);
     QTableWidgetItem *balanceItem = new QTableWidgetItem(balance);
+    QTableWidgetItem *PrivItem = new QTableWidgetItem(privkey);
+    //CRebelliousNodeConfig c;
+    //c.sIndex = index.toStdString();
+   // c.sAddress = addr.toStdString();
+  //  c.sAlias = alias.toStdString();
+   // c.sCollateralAddress = collateral.toStdString();
+  //  c.sMasternodePrivKey = privkey.toStdString();
 
-    CRebelliousNodeConfig c;
-    c.sIndex = index.toStdString();
-    c.sAddress = addr.toStdString();
-    c.sAlias = alias.toStdString();
-    c.sCollateralAddress = collateral.toStdString();
-    c.sMasternodePrivKey = privkey.toStdString();
-
-    std::string errorMessage;
-    setMasterNodeForIX(c, errorMessage);
-
+    //std::string errorMessage;
+   // setMasterNodeForIX(c, errorMessage);
+    QTableWidgetItem *statusItem = new QTableWidgetItem("Inactive");
+        BOOST_FOREACH(CMasterNode mn, vecMasternodes)
+    {
+        if(QString::fromStdString(mn.addr.ToString()) == index && mn.IsEnabled()) {
+            statusItem->setText("Active");
+        }
+    }
+    int nodeRow = ui->tableWidget_2->rowCount();
+    ui->tableWidget_2->insertRow(nodeRow);
+    LogPrintf("%d ROW COUNT \n",nodeRow);
     ui->tableWidget_2->setItem(nodeRow, 0, aliasItem);
     ui->tableWidget_2->setItem(nodeRow, 1, addrItem);
     ui->tableWidget_2->setItem(nodeRow, 2, statusItem);
-    ui->tableWidget_2->setItem(nodeRow, 3, collateralItem);
-    ui->tableWidget_2->setItem(nodeRow, 4, balanceItem);
+    ui->tableWidget_2->setItem(nodeRow, 3, collateralItem );
+    // ui->tableWidget_2->setItem(nodeRow, 4, balanceItem); TODO BALANCE
+  //  ui->tableWidget_2->setItem(nodeRow, 4, balanceItem);
+   // bool bFound = false;
+   // int nodeRow = 0;
+
+    //QList<QTableWidgetItem *> items = ui->tableWidget_2->findItems(collateral, Qt::MatchExactly);
+
+  //  if(items.count() > 0){
+        //return;
+        //bFound = true;
+        //nodeRow = items.at(0)->row();
+  //  }
+
+   // std::string indexToDisplay = index.toStdString();
+
+    //if(nodeRow == 0 && !bFound) {
+       //     ui->tableWidget_2->insertRow(0);
+       //     indexToDisplay = "Masternode_"+index.toStdString();
+   // }
+
+   // boost::replace_all(indexToDisplay, "_", " ");
+
+    //QTableWidgetItem *statusItem = new QTableWidgetItem("Inactive");
+
+//    BOOST_FOREACH(CMasterNode mn, vecMasternodes)
+//    {
+//        if(QString::fromStdString(mn.addr.ToString()) == addr && mn.IsEnabled()) {
+//            statusItem->setText("Active");
+//        }
+//    }
+
+//    QTableWidgetItem *aliasItem = new QTableWidgetItem(QString::fromStdString(index.toStdString()));
+//    QTableWidgetItem *addrItem = new QTableWidgetItem(addr);
+//    QTableWidgetItem *collateralItem = new QTableWidgetItem(collateral);
+//    //QTableWidgetItem *balanceItem = new QTableWidgetItem(balance);
+//    QTableWidgetItem *balanceItem = new QTableWidgetItem(privkey);
+//    CRebelliousNodeConfig c;
+//    c.sIndex = index.toStdString();
+//    c.sAddress = addr.toStdString();
+//    c.sAlias = alias.toStdString();
+//    c.sCollateralAddress = collateral.toStdString();
+//    c.sMasternodePrivKey = privkey.toStdString();
+//
+//    std::string errorMessage;
+//    setMasterNodeForIX(c, errorMessage);
+//
+//    ui->tableWidget_2->setItem(nodeRow, 0, aliasItem);
+//    ui->tableWidget_2->setItem(nodeRow, 1, addrItem);
+//    ui->tableWidget_2->setItem(nodeRow, 2, statusItem);
+//    ui->tableWidget_2->setItem(nodeRow, 3, collateralItem);
+//   // ui->tableWidget_2->setItem(nodeRow, 4, balanceItem); TODO BALANCE
+//    ui->tableWidget_2->setItem(nodeRow, 4, balanceItem);
 }
 
 static QString seconds_to_DHMS(quint32 duration)
@@ -256,11 +288,11 @@ void MasternodeManager::updateNodeList()
     ui->countLabel->setText("Updating...");
     ui->tableWidget->clearContents();
     ui->tableWidget->setRowCount(0);
-
+    int mnRow = 0;
     BOOST_FOREACH(CMasterNode mn, vecMasternodes)
     {
-        int mnRow = 0;
-        ui->tableWidget->insertRow(0);
+
+        ui->tableWidget->insertRow(mnRow);
 //        mn.UpdateLastSeen();
 
  	// populate list
@@ -269,34 +301,45 @@ void MasternodeManager::updateNodeList()
     QTableWidgetItem *rankItem = new QTableWidgetItem(QString::number(GetMasternodeRank(mn.vin, chainActive.Height())));
 	QTableWidgetItem *activeSecondsItem = new QTableWidgetItem(seconds_to_DHMS((qint64)(mn.lastTimeSeen - mn.now)));
     QTableWidgetItem *lastSeenItem = new QTableWidgetItem(QString::fromStdString(DateTimeStrFormat("%Y-%m-%d %H:%M:%S", mn.lastTimeSeen)));
-	
+
 	CScript pubkey;
         pubkey =GetScriptForDestination(mn.pubkey.GetID());
         CTxDestination address1;
         ExtractDestination(pubkey, address1);
         CBitcoinAddress address2(address1);
 	QTableWidgetItem *pubkeyItem = new QTableWidgetItem(QString::fromStdString(address2.ToString()));
-	
+
     ui->tableWidget->setItem(mnRow, 0, rankItem);
     ui->tableWidget->setItem(mnRow, 1, activeItem);
     ui->tableWidget->setItem(mnRow, 2, activeSecondsItem);
     ui->tableWidget->setItem(mnRow, 3, pubkeyItem);
+    mnRow++;
 
     }
 
-    ui->countLabel->setText(QString::number(ui->tableWidget->rowCount()));
-
-    if(pwalletMain)
+//    ui->countLabel->setText(QString::number(ui->tableWidget->rowCount()));
+int cc = 0;
+    BOOST_FOREACH(PAIRTYPE(std::string, CRebelliousNodeConfig) adrenaline, pwalletMain->mapMyRebelliousNodes)
     {
+    cc++;
+    }
+    LogPrintf("CC %d ---- %d \n",cc,ui->tableWidget_2->rowCount());
+    if(pwalletMain && ui->tableWidget_2->rowCount() != cc )
+    {
+        ui->tableWidget_2->clearContents();
+        ui->tableWidget_2->setRowCount(0);
         LOCK(cs_adrenaline);
         CAmount balance;
         QString strBalance;
-        BOOST_REVERSE_FOREACH(PAIRTYPE(std::string, CRebelliousNodeConfig) adrenaline, pwalletMain->mapMyRebelliousNodes)
+        BOOST_FOREACH(PAIRTYPE(std::string, CRebelliousNodeConfig) adrenaline, pwalletMain->mapMyRebelliousNodes)
         {
             balance = GetAccountBalance(adrenaline.second.sIndex, 1, ISMINE_SPENDABLE);
             strBalance = BitcoinUnits::simpleFormat(0, balance, false, BitcoinUnits::separatorAlways, 2);
+            //LogPrintf("%s",adrenaline.second.sAlias);
+            LogPrintf(" Alias - %s Address - %s PrivKey - %s ColAddress - %s, Index - %s \n",adrenaline.second.sAlias,adrenaline.second.sAddress,adrenaline.second.sMasternodePrivKey,adrenaline.second.sCollateralAddress,adrenaline.second.sIndex);
             updateRebelliousNode(QString::fromStdString(adrenaline.second.sAlias), QString::fromStdString(adrenaline.second.sAddress), QString::fromStdString(adrenaline.second.sMasternodePrivKey), QString::fromStdString(adrenaline.second.sCollateralAddress), strBalance, QString::fromStdString(adrenaline.second.sIndex));
         }
+
     }
 }
 
@@ -321,6 +364,8 @@ void MasternodeManager::on_createButton_clicked()
 {
     AddEditRebelliousNode* aenode = new AddEditRebelliousNode();
     aenode->exec();
+    updateNodeList();
+
 }
 
 void MasternodeManager::on_copyAddressButton_clicked()
@@ -399,37 +444,58 @@ void MasternodeManager::on_removeButton_clicked()
         return;
 
     QMessageBox::StandardButton confirm;
-    confirm = QMessageBox::question(this, "Delete Masternode?", "Are you sure you want to delete this masternode configuration?", QMessageBox::Yes|QMessageBox::No);
 
-    if(confirm == QMessageBox::Yes)
-    {
+    confirm = QMessageBox::question(this, "Delete Masternode?", "Are you sure you want to delete this masternode configuration?", QMessageBox::Yes|QMessageBox::No);
+    if(confirm == QMessageBox::Yes) {
         QModelIndex index = selected.at(0);
         int r = index.row();
-        std::string mnIndex = "Masternode_"+std::to_string(r+1);
-        CRebelliousNodeConfig c = pwalletMain->mapMyRebelliousNodes[mnIndex];
-
-        std::string sAddress = ui->tableWidget_2->item(r, 1)->text().toStdString();
-
+        const QAbstractItemModel *model = index.model();
+        std::string selnode = model->data(model->index(index.row(), 3), Qt::DisplayRole).toString().toStdString();
         std::string errorMessage;
-        bool result = activeMasternode.StopMasterNode(c.sAddress, c.sMasternodePrivKey, errorMessage, masternodeConfig.findEntryByIp(sAddress).getVin());
+        bool find = false;
+        CRebelliousNodeConfig c;
         QMessageBox msg;
-        if(result) {
-            msg.setText("Masternode at " + QString::fromStdString(c.sAddress) + " stopped.");
-            fMasterNode = false;
-        } else {
-            msg.setText("Error: " + QString::fromStdString(errorMessage));
-        }
-        msg.exec();
 
-        CWalletDB walletdb(pwalletMain->strWalletFile);
-        pwalletMain->mapMyRebelliousNodes.erase(mnIndex);
-        masternodeConfig.remove(mnIndex);
-        walletdb.EraseRebelliousNodeConfig(c.sIndex);
-        ui->tableWidget_2->clearContents();
-        ui->tableWidget_2->setRowCount(0);
-        BOOST_FOREACH(PAIRTYPE(std::string, CRebelliousNodeConfig) adrenaline, pwalletMain->mapMyRebelliousNodes)
+        BOOST_FOREACH(PAIRTYPE(std::string, CRebelliousNodeConfig)
+        adrenaline, pwalletMain->mapMyRebelliousNodes)
         {
-            updateRebelliousNode(QString::fromStdString(adrenaline.second.sAlias), QString::fromStdString(adrenaline.second.sAddress), QString::fromStdString(adrenaline.second.sMasternodePrivKey), QString::fromStdString(adrenaline.second.sCollateralAddress), "", QString::fromStdString(adrenaline.second.sIndex));
+            if (selnode == adrenaline.second.sCollateralAddress) {
+                CRebelliousNodeConfig c = adrenaline.second;
+
+                bool result = activeMasternode.StopMasterNode(c.sAddress, c.sMasternodePrivKey, errorMessage,
+                                                              masternodeConfig.findEntryByIp(c.sAddress).getVin());
+                if (result) {
+                    msg.setText("Masternode at " + QString::fromStdString(c.sAddress) + " stopped.");
+                    fMasterNode = false;
+                } else {
+                    msg.setText("Error: Stop failed, masternode no active!" + QString::fromStdString(errorMessage));
+                }
+
+                find = true;
+            }
+
+        }
+        std::string indexis = std::to_string(r+1);
+        if (find) {
+            CWalletDB walletdb(pwalletMain->strWalletFile);
+            pwalletMain->mapMyRebelliousNodes.erase(indexis);
+            LogPrintf("%s INDEXIS -1 \n",r);
+            masternodeConfig.remove(indexis);
+            walletdb.EraseRebelliousNodeConfig(indexis);
+            ui->tableWidget_2->clearContents();
+            ui->tableWidget_2->setRowCount(0);
+            BOOST_FOREACH(PAIRTYPE(std::string, CRebelliousNodeConfig)
+            adrenaline, pwalletMain->mapMyRebelliousNodes)
+            {
+                if (selnode != adrenaline.second.sCollateralAddress) {
+                    updateRebelliousNode(QString::fromStdString(adrenaline.second.sAlias),
+                                         QString::fromStdString(adrenaline.second.sAddress),
+                                         QString::fromStdString(adrenaline.second.sMasternodePrivKey),
+                                         QString::fromStdString(adrenaline.second.sCollateralAddress), "",
+                                         QString::fromStdString(adrenaline.second.sIndex));
+                }
+            }
+            msg.exec();
         }
     }
 }
@@ -444,8 +510,21 @@ void MasternodeManager::on_startButton_clicked()
 
     QModelIndex index = selected.at(0);
     int r = index.row();
-    std::string mnIndex = "Masternode_"+std::to_string(r+1);
+    std::string mnIndex = "Masternode_"+std::to_string(r);
+    const QAbstractItemModel * model = index.model();
+    std::string selnode = model->data(model->index(index.row(), 3), Qt::DisplayRole).toString().toStdString();
+
+    BOOST_FOREACH(PAIRTYPE(std::string, CRebelliousNodeConfig) adrenaline, pwalletMain->mapMyRebelliousNodes)
+    {
+
+        if(selnode == adrenaline.second.sCollateralAddress){
+            mnIndex = adrenaline.second.sIndex;
+        }
+
+    }
+
     CRebelliousNodeConfig c = pwalletMain->mapMyRebelliousNodes[mnIndex];
+    std::string sAddress = selnode;
 
     std::string errorMessage;
 
@@ -467,7 +546,6 @@ void MasternodeManager::on_startButton_clicked()
 
 void MasternodeManager::on_stopButton_clicked()
 {
-    // start the node
     QItemSelectionModel* selectionModel = ui->tableWidget_2->selectionModel();
     QModelIndexList selected = selectionModel->selectedRows();
     if(selected.count() == 0)
@@ -475,20 +553,30 @@ void MasternodeManager::on_stopButton_clicked()
 
     QModelIndex index = selected.at(0);
     int r = index.row();
-    std::string mnIndex = "Masternode_"+std::to_string(r+1);
-    std::string sAddress = ui->tableWidget_2->item(r, 1)->text().toStdString();
-    CRebelliousNodeConfig c = pwalletMain->mapMyRebelliousNodes[mnIndex];
+    const QAbstractItemModel * model = index.model();
 
+    std::string selnode = model->data(model->index(index.row(), 3), Qt::DisplayRole).toString().toStdString();
     std::string errorMessage;
-    bool result = activeMasternode.StopMasterNode(c.sAddress, c.sMasternodePrivKey, errorMessage, masternodeConfig.findEntryByIp(sAddress).getVin());
-    QMessageBox msg;
-    if(result) {
-        msg.setText("Masternode at " + QString::fromStdString(c.sAddress) + " stopped.");
-        fMasterNode = false;
-    } else {
-        msg.setText("Error: " + QString::fromStdString(errorMessage));
+
+    BOOST_FOREACH(PAIRTYPE(std::string, CRebelliousNodeConfig) adrenaline, pwalletMain->mapMyRebelliousNodes)
+    {
+
+        if(selnode == adrenaline.second.sCollateralAddress){
+            CRebelliousNodeConfig c = adrenaline.second;
+            QMessageBox msg;
+                bool result = activeMasternode.StopMasterNode(c.sAddress, c.sMasternodePrivKey, errorMessage,
+                                                              masternodeConfig.findEntryByIp(c.sAddress).getVin());
+                if(result) {
+                    msg.setText("Masternode at " + QString::fromStdString(c.sAddress) + " stopped.");
+                    fMasterNode = false;
+                } else {
+                    msg.setText("Error: Stop failed, masternode no active!" + QString::fromStdString(errorMessage));
+                }
+            msg.exec();
+        }
+
     }
-    msg.exec();
+
 }
 
 void MasternodeManager::on_actionsBox_activated(int index)
