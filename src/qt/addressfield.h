@@ -90,8 +90,6 @@ public Q_SLOTS:
      */
     void on_editingFinished();
 
-private:
-    void appendAddress(const QString& strAddress);
 
 private:
     QStringList m_stringList;

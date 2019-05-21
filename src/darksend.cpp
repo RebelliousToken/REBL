@@ -12,7 +12,7 @@
 #include "masternode.h"
 #include "instantx.h"
 #include "ui_interface.h"
-//#include "random.h"
+
 
 #include <openssl/rand.h>
 
@@ -55,14 +55,11 @@ void ProcessDarksend(CNode* pfrom, const std::string& strCommand, CDataStream& v
     if (strCommand == "dsf") { //DarkSend Final tx
         isDarksend = true;
 
-        if (pfrom->nVersion < darkSendPool.MIN_PEER_PROTO_VERSION) {
-            return;
-        }
+        if (pfrom->nVersion < darkSendPool.MIN_PEER_PROTO_VERSION)  return;
 
-        if((CNetAddr)darkSendPool.submittedToMasternode != (CNetAddr)pfrom->addr){
-            //LogPrintf("dsc - message doesn't match current masternode - %s != %s\n", darkSendPool.submittedToMasternode.ToString().c_str(), pfrom->addr.ToString().c_str());
-            return;
-        }
+
+        if((CNetAddr)darkSendPool.submittedToMasternode != (CNetAddr)pfrom->addr)  return;
+
 
         int sessionID;
         CTransaction txNew;
@@ -84,10 +81,8 @@ void ProcessDarksend(CNode* pfrom, const std::string& strCommand, CDataStream& v
             return;
         }
 
-        if((CNetAddr)darkSendPool.submittedToMasternode != (CNetAddr)pfrom->addr){
-            //LogPrintf("dsc - message doesn't match current masternode - %s != %s\n", darkSendPool.submittedToMasternode.ToString().c_str(), pfrom->addr.ToString().c_str());
-            return;
-        }
+        if((CNetAddr)darkSendPool.submittedToMasternode != (CNetAddr)pfrom->addr)    return;
+
 
         int sessionID;
         bool error;
@@ -338,9 +333,7 @@ void ProcessDarksend(CNode* pfrom, const std::string& strCommand, CDataStream& v
     else if (strCommand == "dssub") { //DarkSend Subscribe To
         isDarksend = true;
 
-        if (pfrom->nVersion < darkSendPool.MIN_PEER_PROTO_VERSION) {
-            return;
-        }
+        if (pfrom->nVersion < darkSendPool.MIN_PEER_PROTO_VERSION)      return;
 
         if(!fMasterNode) return;
 
@@ -352,14 +345,10 @@ void ProcessDarksend(CNode* pfrom, const std::string& strCommand, CDataStream& v
     else if (strCommand == "dssu") { //DarkSend status update
         isDarksend = true;
 
-        if (pfrom->nVersion < darkSendPool.MIN_PEER_PROTO_VERSION) {
-            return;
-        }
+        if (pfrom->nVersion < darkSendPool.MIN_PEER_PROTO_VERSION) return;
 
-        if((CNetAddr)darkSendPool.submittedToMasternode != (CNetAddr)pfrom->addr){
-            //LogPrintf("dssu - message doesn't match current masternode - %s != %s\n", darkSendPool.submittedToMasternode.ToString().c_str(), pfrom->addr.ToString().c_str());
-            return;
-        }
+
+        if((CNetAddr)darkSendPool.submittedToMasternode != (CNetAddr)pfrom->addr)   return;
 
         int sessionID;
         int state;
@@ -382,9 +371,8 @@ void ProcessDarksend(CNode* pfrom, const std::string& strCommand, CDataStream& v
     else if (strCommand == "dss") { //DarkSend Sign Final Tx
         isDarksend = true;
 
-        if (pfrom->nVersion < darkSendPool.MIN_PEER_PROTO_VERSION) {
-            return;
-        }
+        if (pfrom->nVersion < darkSendPool.MIN_PEER_PROTO_VERSION)    return;
+
 
         vector<CTxIn> sigs;
         vRecv >> sigs;

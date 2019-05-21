@@ -610,7 +610,6 @@ void BitcoinGUI::createToolBars()
         vl->addStretch();
         vl->addStretch();
         vl->addStretch();
-        //vl->addWidget(statusTipLabel);
         vl->addWidget(progressBar);
         vl->addWidget(progressBarLabel);
         vl->addWidget(frameBlocks);

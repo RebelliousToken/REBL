@@ -50,10 +50,6 @@ void QValidatedTextEdit::setValid(bool _valid)
     {
         setStyleSheet("");
     }
-    else
-    {
-       // SetObjectStyleSheet(this, StyleSheetNames::Invalid);    Testing 
-    }
     this->valid = _valid;
 }
 

@@ -87,13 +87,6 @@ AskPassphraseDialog::~AskPassphraseDialog()
     ui->passEdit3->setText(QString(" ").repeated(ui->passEdit3->text().size()));
     delete ui;
 }
-/*
-void AskPassphraseDialog::setModel(WalletModel* model)
-{
-    this->model = model;
-    ui->anonymizationCheckBox->setChecked(model->isAnonymizeOnlyUnlocked());
-}
-*/
 void AskPassphraseDialog::accept()
 {
     SecureString oldpass, newpass1, newpass2;

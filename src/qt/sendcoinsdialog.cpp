@@ -141,14 +141,8 @@ SendCoinsDialog::SendCoinsDialog(QWidget* parent) : QDialog(parent),
     ui->sliderSmartFee->setValue(settings.value("nSmartFeeSliderPosition").toInt());
     ui->customFee->setValue(settings.value("nTransactionFee").toLongLong());
     ui->checkBoxMinimumFee->setChecked(settings.value("fPayOnlyMinFee").toBool());
- // ui->checkBoxFreeTx->setChecked(settings.value("fSendFreeTransactions").toBool());
     minimizeFeeSection(settings.value("fFeeSectionMinimized").toBool());
 
-//    QIcon* icon = new QIcon(":/icons/info_icon");
-//    QLabel* infoIcon = new QLabel(ui->checkInstanTX);
-//    int infoIconSize = 20;
-//    ui->infoIcon->setPixmap(icon->pixmap(infoIconSize));
-//    ui->infoIcon->setFixedSize(infoIconSize, infoIconSize);
 
     ui->clearButton->hide();
     ui->addButton->hide();
@@ -222,7 +216,6 @@ SendCoinsDialog::~SendCoinsDialog()
     settings.setValue("nSmartFeeSliderPosition", ui->sliderSmartFee->value());
     settings.setValue("nTransactionFee", (qint64)ui->customFee->value());
     settings.setValue("fPayOnlyMinFee", ui->checkBoxMinimumFee->isChecked());
- // settings.setValue("fSendFreeTransactions", ui->checkBoxFreeTx->isChecked());
 
     delete ui;
 }
@@ -720,7 +713,6 @@ void SendCoinsDialog::updateGlobalFeeVariables()
         fPayAtLeastCustomFee = ui->radioCustomAtLeast->isChecked();
     }
 
- //   fSendFreeTransactions = ui->checkBoxFreeTx->isChecked();
 }
 
 void SendCoinsDialog::updateFeeMinimizedLabel()

@@ -99,6 +99,10 @@ CScript COINBASE_FLAGS;
 
 const string strMessageMagic = "Rebellious Signed Message:\n";
 
+static unsigned int nMarutiryV1 = 10;
+static unsigned int nMarutiryV2 = 119;
+const int targetReadjustment_forkBlockHeight = 136850; //retargeting since 136850 block
+
 // Internal stuff
 namespace
 {
@@ -200,6 +204,27 @@ struct CMainSignals {
     boost::signals2::signal<void(const CBlock&, const CValidationState&)> BlockChecked;
 } g_signals;
 
+}
+
+bool IsProtocolMaturityV2(int nHeight)
+{
+    return(nHeight >= targetReadjustment_forkBlockHeight);
+}
+
+unsigned int GetnMaturity(int nHeight)
+{
+    if(IsProtocolMaturityV2(nHeight))
+        return nMarutiryV2;
+    else
+        return nMarutiryV1;
+}
+
+int GetMinPeerProtoVersion(int nHeight)
+{
+    if(nHeight!=0)
+        return(IsProtocolMaturityV2(nHeight)? NEW_PROTOCOL_VERSION : PROTOCOL_VERSION);
+    else
+        return NEW_PROTOCOL_VERSION; //if we build blockchain from the scratch, ask for a new version first
 }
 
 void RegisterValidationInterface(CValidationInterface* pwalletIn)
@@ -1615,10 +1640,7 @@ double ConvertBitsToDouble(unsigned int nBits)
 
 uint256 GetProofOfStakeLimit(int nHeight)
 {
-    if (IsProtocolV2(nHeight))
-        return bnProofOfStakeLimitV2;
-    else
-        return bnProofOfStakeLimit;
+    return bnProofOfStakeLimitV2;
 }
 
 CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
@@ -1901,7 +1923,7 @@ bool CheckInputs(const CTransaction& tx, CValidationState& state, const CCoinsVi
 
             // If prev is coinbase, check that it's matured
             if (coins->IsCoinBase() || coins->IsCoinStake()) {
-                if (nSpendHeight - coins->nHeight < Params().COINBASE_MATURITY())
+                if (nSpendHeight - coins->nHeight < GetnMaturity(nSpendHeight))
                     return state.Invalid(
                         error("CheckInputs() : tried to spend coinbase at depth %d, coinstake=%d", nSpendHeight - coins->nHeight, coins->IsCoinStake()),
                         REJECT_INVALID, "bad-txns-premature-spend-of-coinbase");

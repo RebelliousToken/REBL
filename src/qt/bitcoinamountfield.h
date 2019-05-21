@@ -36,7 +36,6 @@ public:
 
     /** Make read-only **/
     void setReadOnly(bool fReadOnly);
-    void setReadOnlyUnit(bool fReadOnly);
 
 
     /** Mark current value as invalid in UI. */
@@ -69,8 +68,6 @@ private:
     AmountSpinBox* amount;
     QValueComboBox* unit;
 
-private slots:
-    void unitChanged(int idx);
 };
 
 #endif // BITCOIN_QT_BITCOINAMOUNTFIELD_H

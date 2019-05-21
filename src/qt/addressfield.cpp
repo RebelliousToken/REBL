@@ -56,8 +56,6 @@ bool AddressField::isValidAddress()
             return false;
     }
 
-   // ((QValidatedLineEdit*)lineEdit())->checkValidity();   Testing
-   // return ((QValidatedLineEdit*)lineEdit())->isValid();
 }
 
 void AddressField::setComboBoxEditable(bool editable)
@@ -79,14 +77,11 @@ void AddressField::on_refresh()
     // Initialize variables
     QString currentAddress = currentText();
     m_stringList.clear();
-   // vector<COutput> vecOutputs; Testing
-   // assert(pwalletMain != NULL); Testing 
+
 
     // Fill the list with address
     if(m_addressType == AddressField::UTXO)
     {
-        // Fill the list with UTXO
-       // LOCK2(cs_main, pwalletMain->cs_wallet);   Testing
 
         // Add all available addresses if 0 address ballance for token is enabled
         if(m_addressTableModel)
@@ -97,32 +92,10 @@ void AddressField::on_refresh()
                 QModelIndex index = m_addressTableModel->index(row, m_addressColumn);
                 QString strAddress = m_addressTableModel->data(index).toString();
                 QString type = m_addressTableModel->data(index, m_typeRole).toString();
-                if(type == m_receive)
-                {
-                    appendAddress(strAddress);
-                }
+
             }
 
-            // Include zero or unconfirmed coins too
-          //  pwalletMain->AvailableCoins(vecOutputs, false, NULL, true);   Testing
         }
-        else
-        {
-            // List only the spendable coins
-           // pwalletMain->AvailableCoins(vecOutputs);   Testing
-        }
-
-       /* BOOST_FOREACH(const COutput& out, vecOutputs) {
-            CTxDestination address;
-            const CScript& scriptPubKey = out.tx->tx->vout[out.i].scriptPubKey;
-            bool fValidAddress = ExtractDestination(scriptPubKey, address);
-
-            if (fValidAddress)
-            {
-                QString strAddress = QString::fromStdString(CBitcoinAddress(address).ToString());
-                appendAddress(strAddress);
-            }
-        }*/   //Testing
     }
 
     // Update the current index
@@ -143,16 +116,6 @@ void AddressField::on_editingFinished()
     Q_EMIT editTextChanged(QComboBox::currentText());
 }
 
-void AddressField::appendAddress(const QString &strAddress)
-{
-    /*CBitcoinAddress address(strAddress.toStdString());
-    if(!m_stringList.contains(strAddress) &&
-            IsMine(*pwalletMain, address.Get()))
-    {
-        m_stringList.append(strAddress);
-    }*/    //Testing
-    return;
-}
 
 void AddressField::setReceive(const QString &receive)
 {

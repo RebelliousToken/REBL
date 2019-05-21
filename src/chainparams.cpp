@@ -133,7 +133,7 @@ public:
         nTargetTimespan = 25 * 30; // REBL: 1 36hrs
         nTargetSpacing = 30;  // REBL: 2 minute
         nLastPOWBlock = 80;
-        nMaturity = 10;
+        nMaturity = 119;
         nMasternodeCountDrift = 20;
         nModifierUpdateBlock = 615800;
 
@@ -165,7 +165,6 @@ public:
         assert(genesis.hashMerkleRoot == uint256("3c8a16464c668798013ce24d96a0f5ac5c03349a67fd18eb41e0ddf03825fc60"));
         vSeeds.clear();
         vSeeds.push_back(CDNSSeedData("1", "dnsseed.rebellious.io")); // DNSSeed
-     
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,60); // REBL - 60
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,122); // REBL - 122

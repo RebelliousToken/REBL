@@ -44,26 +44,17 @@ SendCoinsEntry::SendCoinsEntry(QWidget* parent) : QStackedWidget(parent),
     connect(ui->deleteButton_is, SIGNAL(clicked()), this, SLOT(deleteClicked()));
     connect(ui->deleteButton_s, SIGNAL(clicked()), this, SLOT(deleteClicked()));
 
-//    connect(ui->addressBookButton, SIGNAL(clicked()), BitcoinApplication::instance(), SLOT(setEffect(new DarkenEffect)));
-
-//    QGraphicsDropShadowEffect *shadowPayTo = new QGraphicsDropShadowEffect();
-//    shadowPayTo->setBlurRadius(10);
-//    shadowPayTo->setColor(0x555555);
-//    shadowPayTo->setOffset(0);
-//    ui->payTo->setGraphicsEffect(shadowPayTo);
 
     const int shadowBlurRadius = 10;
     const int shadowOffsetX = 0;
     const int shadowOffsetY = 3;
     QColor shadowColor = QColor(0, 0, 0, 50);
-// box-shadow: inset 0px 0px 20px 0px rgba(0,0,0,0.75);
     QGraphicsDropShadowEffect *totalShadow = new QGraphicsDropShadowEffect();
     totalShadow->setBlurRadius(shadowBlurRadius);
     totalShadow->setColor(shadowColor);
     totalShadow->setOffset(shadowOffsetX, shadowOffsetY);
     ui->totalWidget->setGraphicsEffect(totalShadow);
 
-//    ui->payAmount->setGraphicsEffect(totalShadow);
 
     QGraphicsDropShadowEffect *shadowAddressBookButton = new QGraphicsDropShadowEffect();
     shadowAddressBookButton->setBlurRadius(10);
