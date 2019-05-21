@@ -88,17 +88,10 @@ bool CBlockTreeDB::WriteBlockIndex(const CDiskBlockIndex& blockindex)
                 blockindexFixed.hashProofOfStake = hashProofOfStake;
                 return Write(make_pair('b', hash), blockindexFixed);
             } else {
-#               if 0
-                LogPrint("debug", "%s: zero stake block %s", __func__, hash.GetHex());
-#               else
                 return error("%s: zero stake (block %s)", __func__, hash.GetHex());
-#               endif
+
             }
         }
-#   if 0
-    } else if (!CheckProofOfWork(hash, blockindex.nBits)) {
-        LogPrint("debug", "%s: bad work block %d %d %s", __func__, blockindex.nBits, blockindex.nHeight, hash.GetHex()); //return error("%s: invalid proof of work: %d %d %s", __func__, blockindex.nBits, blockindex.nHeight, hash.GetHex());
-#   endif
     }
     return Write(make_pair('b', hash), blockindex);
 }
@@ -271,11 +264,7 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
                     auto const &hash(pindexNew->GetBlockHash());
                     if (!CheckProofOfWork(hash, pindexNew->nBits)) {
                         unsigned int nBits = pindexPrev ? pindexPrev->nBits : 0;
-#                       if 0
-                        LogPrint("debug", "%s: CheckProofOfWork failed: %d %s (%d, %d)\n", __func__, pindexNew->nHeight, hash.GetHex(), pindexNew->nBits, nBits);
-#                       else
                         return error("%s: CheckProofOfWork failed: %d %s (%d, %d)", __func__, pindexNew->nHeight, hash.GetHex(), pindexNew->nBits, nBits);
-#                       endif
                     }
                 }
 

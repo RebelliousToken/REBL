@@ -20,8 +20,6 @@ QList<BitcoinUnits::Unit> BitcoinUnits::availableUnits()
 {
     QList<BitcoinUnits::Unit> unitlist;
     unitlist.append(REBL);
-//    unitlist.append(mREBL);
-//    unitlist.append(uREBL);
     return unitlist;
 }
 
@@ -29,8 +27,6 @@ bool BitcoinUnits::valid(int unit)
 {
     switch (unit) {
     case REBL:
-//    case mREBL:
-//    case uREBL:
         return true;
     default:
         return false;
@@ -42,10 +38,6 @@ QString BitcoinUnits::id(int unit)
     switch (unit) {
     case REBL:
         return QString("rebellious");
-//    case mREBL:
-//        return QString("mrebellious");
-//    case uREBL:
-//        return QString::fromUtf8("urebellious");
     default:
         return QString("???");
     }
@@ -57,10 +49,6 @@ QString BitcoinUnits::name(int unit)
         switch (unit) {
         case REBL:
             return QString("REBL");
-//        case mREBL:
-//            return QString("mREBL");
-//        case uREBL:
-//            return QString::fromUtf8("μREBL");
         default:
             return QString("???");
         }
@@ -68,10 +56,6 @@ QString BitcoinUnits::name(int unit)
         switch (unit) {
         case REBL:
             return QString("tREBL");
-//        case mREBL:
-//            return QString("mtREBL");
-//        case uREBL:
-//            return QString::fromUtf8("μtREBL");
         default:
             return QString("???");
         }
@@ -84,10 +68,6 @@ QString BitcoinUnits::description(int unit)
         switch (unit) {
         case REBL:
             return QString("REBL");
-//        case mREBL:
-//            return QString("MilliREBL");
-//        case uREBL:
-//            return QString("Micro-REBL (1 / 1" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
         default:
             return QString("???");
         }
@@ -95,10 +75,6 @@ QString BitcoinUnits::description(int unit)
         switch (unit) {
         case REBL:
             return QString("TestREBLs");
-//        case mREBL:
-//            return QString("Milli-TestREBL (1 / 1" THIN_SP_UTF8 "000)");
-//        case uREBL:
-//            return QString("Micro-TestREBL (1 / 1" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
         default:
             return QString("???");
         }
@@ -110,10 +86,6 @@ qint64 BitcoinUnits::factor(int unit)
     switch (unit) {
     case REBL:
         return 100000000;
-//    case mREBL:
-//        return 100000;
-//    case uREBL:
-//        return 100;
     default:
         return 100000000;
     }
@@ -124,10 +96,6 @@ int BitcoinUnits::decimals(int unit)
     switch (unit) {
     case REBL:
         return 8;
-//    case mREBL:
-//        return 5;
-//    case uREBL:
-//        return 2;
     default:
         return 0;
     }

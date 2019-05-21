@@ -51,6 +51,7 @@ static const int MODIFIER_INTERVAL_RATIO = 3;
 
 static const int LAST_MULTIPLIED_BLOCK = 180*1000; // 180K
 
+
 static std::atomic<bool> nStakingInterrupped;
 
 Stake * const stake = Stake::Pointer();
@@ -333,12 +334,12 @@ bool GetKernelStakeModifier(uint256 hashBlockFrom, uint64_t& nStakeModifier, int
 bool MultiplyStakeTarget(uint256 &bnTarget, int nModifierHeight, int64_t nModifierTime, int64_t nWeight)
 {
     typedef std::pair<uint32_t, const char*> mult;
-
 #   if 0
     static std::map<int, mult> stakeTargetMultipliers = boost::assign::map_list_of
 #       include "multipliers.i"
         ;
 #   else
+
     static std::map<int, mult> stakeTargetMultipliers;
     if (stakeTargetMultipliers.empty()) {
         std::multimap<int, mult> mm = boost::assign::map_list_of
@@ -418,6 +419,7 @@ bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const C
         }
     }
 
+
     // Now check if proof-of-stake hash meets target protocol
     return !(hashProofOfStake > bnTarget);
 }
@@ -458,6 +460,7 @@ bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint2
         return error("%s: failed to find block", __func__);
 
     unsigned int nTime = block.nTime;
+
 #   if 0
     if (!CheckHash(pindexPrev, block.nBits, prevBlock, txPrev, txin.prevout, nTime, hashProofOfStake))
         // may occur during initial download or if behind on block chain sync
@@ -465,8 +468,10 @@ bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint2
                      tx.GetHash().ToString(), hashProofOfStake.ToString());
     return true;
 #   else
-    return CheckHash(pindexPrev, block.nBits, prevBlock, txPrev, txin.prevout, nTime, hashProofOfStake);
+
+     return CheckHash(pindexPrev, block.nBits, prevBlock, txPrev, txin.prevout, nTime, hashProofOfStake);
 #   endif
+
 }
 
 // Get stake modifier checksum
@@ -651,8 +656,8 @@ bool Stake::SelectStakeCoins(CWallet *wallet, std::set<std::pair<const CWalletTx
         auto const nAge = stake->GetStakeAge(out.tx->GetTxTime());
         if (nTime < nAge) continue;
 
-        //check that it is matured
-        if (out.nDepth < (out.tx->IsCoinStake() ? Params().COINBASE_MATURITY() : 10))
+        // check that it is matured
+        if (out.nDepth < (out.tx->IsCoinStake() ? GetnMaturity(chainActive.Tip()->nHeight + 1) : 10))
             continue;
 
         //add to our stake set
@@ -1004,7 +1009,7 @@ void Stake::StakingThread(CWallet *wallet)
                     LOCK(cs_main);
                     tip = chainActive.Tip();
                     nHeight = tip->nHeight;
-                    if (/*tip->nHeight < Params().LAST_POW_BLOCK() ||*/ IsBlockStaked(tip->nHeight)) {
+                    if (IsBlockStaked(tip->nHeight)) {
                         nCanStake = false;
                     }
                 }
@@ -1035,25 +1040,10 @@ void Stake::StakingThread(CWallet *wallet)
 
 void Stake::GenerateStakes(boost::thread_group &group, CWallet *wallet, int procs)
 {
-#if 0
-    static std::unique_ptr<boost::thread_group> StakingThreads(new boost::thread_group);
-    if (procs == 0) {
-        nStakingInterrupped = true;
-        StakingThreads->interrupt_all();
-        StakingThreads->join_all();
-        nStakingInterrupped = false;
-        return;
-    }
-
-    for (int i = 0; i < procs; ++i) {
-        StakingThreads->create_thread(boost::bind(&Stake::StakingThread, this, wallet));
-    }
-#else
     nStakingInterrupped = procs == 0;
     for (int i = 0; i < procs; ++i) {
         group.create_thread(boost::bind(&Stake::StakingThread, this, wallet));
     }
-#endif
 }
 
 Stake *Stake::Pointer() { return &kernel; }

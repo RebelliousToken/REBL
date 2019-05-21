@@ -8,7 +8,6 @@ void AddressBookTableDelegate::paint(QPainter* painter, const QStyleOptionViewIt
 
     painter->setRenderHint(QPainter::Antialiasing);
     QPainterPath path;
-//        path.addRoundedRect(option.rect.x()-ICON_OFFSET, option.rect.y()-CORRECTION, option.rect.width()-1, option.rect.height()+(CORRECTION * 2.5), BORDER_RADIUS, BORDER_RADIUS);
     QPen pen(QColor(0, 0, 0), 0);
     painter->setPen(pen);
     painter->fillPath(path, QColor(0, 0, 0));

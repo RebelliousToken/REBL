@@ -195,6 +195,8 @@ private:
     //! number of (unique) "new" entries
     int nNew;
 
+    int nodeSelect = 0;
+
     //! list of "new" buckets
     int vvNew[ADDRMAN_NEW_BUCKET_COUNT][ADDRMAN_BUCKET_SIZE];
 

@@ -476,8 +476,6 @@ bool CConsensusVote::SignatureValid()
 {
     std::string errorMessage;
     std::string strMessage = txHash.ToString().c_str() + boost::lexical_cast<std::string>(nBlockHeight);
-    //LogPrintf("verify strMessage %s \n", strMessage.c_str());
-
     int n = GetMasternodeByVin(vinMasternode);
 
     if(n == -1)
@@ -486,16 +484,11 @@ bool CConsensusVote::SignatureValid()
         return false;
     }
 
-    //LogPrintf("verify addr %s \n", vecMasternodes[0].addr.ToString().c_str());
-    //LogPrintf("verify addr %s \n", vecMasternodes[1].addr.ToString().c_str());
-    //LogPrintf("verify addr %d %s \n", n, vecMasternodes[n].addr.ToString().c_str());
-
     CScript pubkey;
     pubkey =GetScriptForDestination(vecMasternodes[n].pubkey2.GetID());
     CTxDestination address1;
     ExtractDestination(pubkey, address1);
     CBitcoinAddress address2(address1);
-    //LogPrintf("verify pubkey2 %s \n", address2.ToString().c_str());
 
     if(!darkSendSigner.VerifyMessage(vecMasternodes[n].pubkey2, vchMasterNodeSignature, strMessage, errorMessage)) {
         LogPrintf("InstantX::CConsensusVote::SignatureValid() - Verify message failed\n");
@@ -512,8 +505,6 @@ bool CConsensusVote::Sign()
     CKey key2;
     CPubKey pubkey2;
     std::string strMessage = txHash.ToString().c_str() + boost::lexical_cast<std::string>(nBlockHeight);
-    //LogPrintf("signing strMessage %s \n", strMessage.c_str());
-    //LogPrintf("signing privkey %s \n", strMasterNodePrivKey.c_str());
 
     if(!darkSendSigner.SetKey(strMasterNodePrivKey, errorMessage, key2, pubkey2))
     {
@@ -526,7 +517,6 @@ bool CConsensusVote::Sign()
     CTxDestination address1;
     ExtractDestination(pubkey, address1);
     CBitcoinAddress address2(address1);
-    //LogPrintf("signing pubkey2 %s \n", address2.ToString().c_str());
 
     if(!darkSendSigner.SignMessage(strMessage, errorMessage, vchMasterNodeSignature, key2)) {
         LogPrintf("CActiveMasternode::RegisterAsMasterNode() - Sign message failed");

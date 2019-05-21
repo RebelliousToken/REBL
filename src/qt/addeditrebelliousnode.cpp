@@ -54,7 +54,6 @@ void AddEditRebelliousNode::on_okButton_clicked()
         CAccount account;
         walletdb.ReadAccount(c.sIndex, account);
         bool bKeyUsed = false;
-        bool bForceNew = false;
 
         // Check if the current key has been used
         if (account.vchPubKey.IsValid())
@@ -72,7 +71,7 @@ void AddEditRebelliousNode::on_okButton_clicked()
         }
 
         // Generate a new key
-        if (!account.vchPubKey.IsValid() || bForceNew || bKeyUsed)
+        if (!account.vchPubKey.IsValid() || bKeyUsed)
         {
             if (!pwalletMain->GetKeyFromPool(account.vchPubKey))
             {

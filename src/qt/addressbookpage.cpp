@@ -58,7 +58,6 @@ AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget* parent) : QDialog
         }
         connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(accept()));
         ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-//        ui->tableView->setItemDelegate(addressTableDelegate);
         ui->tableView->setFocus();
         ui->closeButton->setText(tr("C&hoose"));
         ui->exportButton->hide();

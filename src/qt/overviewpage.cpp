@@ -214,33 +214,17 @@ OverviewPage::OverviewPage(QWidget* parent) : QWidget(parent),
     ui->emailButtonText->setCursor(Qt::PointingHandCursor);
     ui->socialButtonText->setCursor(Qt::PointingHandCursor);
 
-    // init "out of sync" warning labels
+
     ui->labelWalletStatus->setText("(" + tr("out of sync") + ")");
-//    ui->labelDarksendSyncStatus->setText("(" + tr("out of sync") + ")");
-//    ui->labelTransactionsStatus->setText("(" + tr("out of sync") + ")");
-#if 0
-    if (!fLiteMode) {
-        ui->frameDarksend->setVisible(false);
-    }
-#else
+
        {
-        if (fMasterNode) {
-//            ui->toggleDarksend->setText("(" + tr("Disabled") + ")");
-//            ui->darksendAuto->setText("(" + tr("Disabled") + ")");
-//            ui->darksendReset->setText("(" + tr("Disabled") + ")");
-//            ui->frameDarksend->setEnabled(false);
-        } else {
-            if (!fEnableDarksend) {
-//                ui->toggleDarksend->setText(tr("Start Rebellioussend"));
-            } else {
-//                ui->toggleDarksend->setText(tr("Stop Rebellioussend"));
-            }
+        if (!fMasterNode) {
             timer = new QTimer(this);
             connect(timer, SIGNAL(timeout()), this, SLOT(darksendStatus()));
             timer->start(1000);
         }
     }
-#endif
+
 
     // start with displaying the "out of sync" warnings
     showOutOfSyncWarning(true);
@@ -269,28 +253,10 @@ void OverviewPage::setBalance(const CAmount& balance, const CAmount& unconfirmed
 
     const int decimalsWidth = 2;
 
-//    ui->labelImmature->setVisible(showImmature || showWatchOnlyImmature);
-
     ui->labelBalance->setText(BitcoinUnits::simpleFormatWithUnit(nDisplayUnit, balance - immatureBalance, false, BitcoinUnits::separatorAlways, decimalsWidth));
     ui->labelUnconfirmed->setText(BitcoinUnits::simpleFormatWithUnit(nDisplayUnit, unconfirmedBalance, false, BitcoinUnits::separatorAlways, decimalsWidth));
     ui->labelImmature->setText(BitcoinUnits::simpleFormatWithUnit(nDisplayUnit, immatureBalance, false, BitcoinUnits::separatorAlways, decimalsWidth));
-//    ui->labelAnonymized->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, anonymizedBalance, false, BitcoinUnits::separatorAlways));
     ui->labelTotal->setText(BitcoinUnits::simpleFormatWithUnit(nDisplayUnit, balance + unconfirmedBalance, false, BitcoinUnits::separatorAlways, decimalsWidth));
-//    ui->labelWatchAvailable->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, watchOnlyBalance, false, BitcoinUnits::separatorAlways));
-//    ui->labelWatchPending->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, watchUnconfBalance, false, BitcoinUnits::separatorAlways));
-//    ui->labelWatchImmature->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, watchImmatureBalance, false, BitcoinUnits::separatorAlways));
-//    ui->labelWatchTotal->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, watchOnlyBalance + watchUnconfBalance + watchImmatureBalance, false, BitcoinUnits::separatorAlways));
-
-    // only show immature (newly mined) balance if it's non-zero, so as not to complicate things
-    // for the non-mining users
-//    bool showImmature = immatureBalance != 0;
-//    bool showWatchOnlyImmature = watchImmatureBalance != 0;
-
-    // for symmetry reasons also show immature label when the watch-only one is shown
-//    ui->labelImmature->setVisible(showImmature || showWatchOnlyImmature);
-//    ui->labelImmatureText->setVisible(showImmature || showWatchOnlyImmature);
-//    ui->labelWatchImmature->setVisible(showWatchOnlyImmature); // show watch-only immature balance
-
     updateDarksendProgress();
 
     static int cachedTxLocks = 0;
@@ -304,18 +270,7 @@ void OverviewPage::setBalance(const CAmount& balance, const CAmount& unconfirmed
 // show/hide watch-only labels
 void OverviewPage::updateWatchOnlyLabels(bool showWatchOnly)
 {
-//    ui->widget->setVisible(showWatchOnly);      // show watch-only label
-//    ui->labelSpendable->setVisible(showWatchOnly);      // show spendable label (only when watch-only is active)
-//    ui->labelWatchonly->setVisible(showWatchOnly);      // show watch-only label
-   // ui->lineWatchBalance->setVisible(showWatchOnly);    // show watch-only balance separator line
-//    ui->labelWatchAvailable->setVisible(showWatchOnly); // show watch-only available balance
-//    ui->labelWatchPending->setVisible(showWatchOnly);   // show watch-only pending balance
-//    ui->labelWatchTotal->setVisible(showWatchOnly);     // show watch-only total balance
-
-    if (!showWatchOnly) {
-//        ui->labelWatchImmature->hide();
-    } else {
-//        ui->labelBalance->setIndent(20);
+    if (showWatchOnly) {
         ui->labelUnconfirmed->setIndent(20);
         ui->labelImmature->setIndent(20);
         ui->labelTotal->setIndent(20);
@@ -355,9 +310,6 @@ void OverviewPage::setWalletModel(WalletModel* model)
 
         connect(model->getOptionsModel(), SIGNAL(displayUnitChanged(int)), this, SLOT(updateDisplayUnit()));
 
-//        connect(ui->darksendAuto, SIGNAL(clicked()), this, SLOT(darksendAuto()));
-//        connect(ui->darksendReset, SIGNAL(clicked()), this, SLOT(darksendReset()));
-//        connect(ui->toggleDarksend, SIGNAL(clicked()), this, SLOT(toggleDarksend()));
         updateWatchOnlyLabels(model->haveWatchOnly());
         connect(model, SIGNAL(notifyWatchonlyChanged(bool)), this, SLOT(updateWatchOnlyLabels(bool)));
     }
@@ -392,8 +344,6 @@ void OverviewPage::updateAlerts(const QString& warnings)
 void OverviewPage::showOutOfSyncWarning(bool fShow)
 {
     ui->labelWalletStatus->setVisible(fShow);
-//    ui->labelDarksendSyncStatus->setVisible(fShow);
-//    ui->labelTransactionsStatus->setVisible(fShow);
 }
 
 void OverviewPage::updateDarksendProgress()
@@ -404,15 +354,12 @@ void OverviewPage::updateDarksendProgress()
     QString strAnonymizeRebelliousAmount = BitcoinUnits::formatHtmlWithUnit(nDisplayUnit, nAnonymizeRebelliousAmount * COIN, false, BitcoinUnits::separatorAlways);
 
     if (currentBalance == 0) {
-//        ui->darksendProgress->setValue(0);
-//        ui->darksendProgress->setToolTip(tr("No inputs detected"));
+
 
         // when balance is zero just show info from settings
         strAnonymizeRebelliousAmount = strAnonymizeRebelliousAmount.remove(strAnonymizeRebelliousAmount.indexOf("."), BitcoinUnits::decimals(nDisplayUnit) + 1);
         strAmountAndRounds = strAnonymizeRebelliousAmount + " / " + tr("%n Rounds", "", nDarksendRounds);
 
-//        ui->labelAmountRounds->setToolTip(tr("No inputs detected"));
-//        ui->labelAmountRounds->setText(strAmountAndRounds);
         return;
     }
 
@@ -441,22 +388,15 @@ void OverviewPage::updateDarksendProgress()
     if (nMaxToAnonymize == 0) return;
 
     if (nMaxToAnonymize >= nAnonymizeRebelliousAmount * COIN) {
-//        ui->labelAmountRounds->setToolTip(tr("Found enough compatible inputs to anonymize %1")
-//                                              .arg(strAnonymizeRebelliousAmount));
         strAnonymizeRebelliousAmount = strAnonymizeRebelliousAmount.remove(strAnonymizeRebelliousAmount.indexOf("."), BitcoinUnits::decimals(nDisplayUnit) + 1);
         strAmountAndRounds = strAnonymizeRebelliousAmount + " / " + tr("%n Rounds", "", nDarksendRounds);
     } else {
         QString strMaxToAnonymize = BitcoinUnits::formatHtmlWithUnit(nDisplayUnit, nMaxToAnonymize, false, BitcoinUnits::separatorAlways);
-//        ui->labelAmountRounds->setToolTip(tr("Not enough compatible inputs to anonymize <span style='color:red;'>%1</span>,<br>"
-//                                             "will anonymize <span style='color:red;'>%2</span> instead")
-//                                              .arg(strAnonymizeRebelliousAmount)
-//                                              .arg(strMaxToAnonymize));
         strMaxToAnonymize = strMaxToAnonymize.remove(strMaxToAnonymize.indexOf("."), BitcoinUnits::decimals(nDisplayUnit) + 1);
         strAmountAndRounds = "<span style='color:red;'>" +
                              QString(BitcoinUnits::factor(nDisplayUnit) == 1 ? "" : "~") + strMaxToAnonymize +
                              " / " + tr("%n Rounds", "", nDarksendRounds) + "</span>";
     }
-//    ui->labelAmountRounds->setText(strAmountAndRounds);
 
     // calculate parts of the progress, each of them shouldn't be higher than 1
     // progress of denominating
@@ -491,7 +431,6 @@ void OverviewPage::updateDarksendProgress()
     float progress = denomPartCalc + anonNormPartCalc + anonFullPartCalc;
     if (progress >= 100) progress = 100;
 
-//    ui->darksendProgress->setValue(progress);
 
     QString strToolPip = ("<b>" + tr("Overall progress") + ": %1%</b><br/>" +
                           tr("Denominated") + ": %2%<br/>" +
@@ -503,7 +442,6 @@ void OverviewPage::updateDarksendProgress()
                              .arg(anonNormPart)
                              .arg(anonFullPart)
                              .arg(nAverageAnonymizedRounds);
-//    ui->darksendProgress->setToolTip(strToolPip);
 }
 
 void OverviewPage::darksendStatus()
